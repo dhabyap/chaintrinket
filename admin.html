@@ -215,7 +215,7 @@
     <div class="stat-box"><b id="statTotal">3</b><span>Total token</span></div>
     <div class="stat-box jade"><b id="statAvail">2</b><span>Tersedia</span></div>
     <div class="stat-box rust"><b id="statSold">1</b><span>Terjual</span></div>
-    <div class="stat-box gold"><b>Rp 160rb</b><span>Omzet event</span></div>
+    <div class="stat-box gold"><b id="statRp">Rp 0</b><span>Omzet event</span></div>
   </div>
 
   <div class="ledger">
@@ -311,7 +311,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@stellar/stellar-sdk@12.3.0/dist/stellar-sdk.min.js"></script>
 <script src="./js/ct.js"></script>
 <script>
-  const ADMIN = CT.CONFIG.admin;
+  const admin = CT.CONFIG.admin;
   const swatches = ['#c9a227','#2f6e4b','#a13d2b','#5b5748'];
 
   async function loadDashboard() {
@@ -330,8 +330,7 @@
       document.getElementById('statTotal').textContent = rows.length;
       document.getElementById('statAvail').textContent = rows.filter(r => r.status === 'available').length;
       document.getElementById('statSold').textContent = soldCount;
-      document.getElementById('statRp').textContent = Rp
-(rows.reduce((s, t) => s + Math.round(Number(t.price) / 10_000_000 * 17500), 0).toLocaleString('id-ID'));
+      document.getElementById('statRp').textContent = 'Rp ' + (rows.reduce((s, t) => s + Math.round(Number(t.price) / 10_000_000 * 17500), 0)).toLocaleString('id-ID');
       renderLedger(rows);
     } catch(e) {
       document.getElementById('statTotal').textContent = '0';
@@ -371,7 +370,7 @@
     const metaUri = document.getElementById('mintMetaUri').value.trim() || 'ipfs://QmPending';
     try {
       const pubKey = await CT.connectFreighter();
-      if (pubKey !== ADMIN) return alert('Hanya admin yang bisa mint');
+      if (pubKey !== admin) return alert('Hanya admin yang bisa mint');
       showToast('Mengirim mint tx...');
       const res = await CT.mint(pubKey, name, metaUri, price);
       showToast('Mint berhasil! Hash: ' + (res.hash || '').slice(0, 12));

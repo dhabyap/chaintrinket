@@ -435,7 +435,7 @@
   // ─── read tokenId from URL ───
   const params = new URLSearchParams(location.search);
   const TOKEN_ID = parseInt(params.get('id') || '1', 10);
-  const ADMIN_ADDR = 'GA7FSHWRJ2MJ5Y6MKPMORFSDMOWKQTPEREEAQ4AVSJO5ROS3CCEGBJ7X';
+  const ADMIN_ADDR = CT.CONFIG.admin;
 
   let connectedPubKey = null;
 
