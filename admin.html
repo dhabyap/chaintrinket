@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChainTrinket — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0e0f0c; --bg-2:#15160f; --bg-3:#1c1e14;
+    --paper:#f6f1e4; --paper-2:#ece4d0; --paper-3:#e2d8bc;
+    --ink:#1b1b16; --ink-soft:#5b5748;
+    --gold:#c9a227; --gold-light:#e4c767;
+    --jade:#2f6e4b; --jade-light:#dceae1;
+    --rust:#a13d2b; --rust-light:#f1dcd3;
+    --line:rgba(246,241,228,0.12);
+    --font-display:'Fraunces', serif;
+    --font-body:'Space Grotesk', sans-serif;
+    --font-mono:'JetBrains Mono', monospace;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0; background:var(--bg); color:var(--paper);
+    font-family:var(--font-body); -webkit-font-smoothing:antialiased;
+  }
+  a{ color:inherit; text-decoration:none; }
+  button{ font-family:inherit; cursor:pointer; border:none; }
+  :focus-visible{ outline:2px solid var(--gold-light); outline-offset:2px; }
+
+  /* ===== topbar ===== */
+  .topbar{
+    position:sticky; top:0; z-index:20;
+    background:rgba(14,15,12,0.9); backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 24px;
+  }
+  .brand{ display:flex; align-items:center; gap:9px; font-family:var(--font-display); font-weight:700; font-size:17px; }
+  .brand-mark{
+    width:24px; height:24px; border-radius:50%; border:1.5px solid var(--gold);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-mono); font-size:10px; font-weight:600; color:var(--gold-light);
+  }
+  .brand-sub{ font-family:var(--font-mono); font-size:11px; color:rgba(246,241,228,0.45); margin-left:10px; }
+  .topbar-right{ display:flex; align-items:center; gap:12px; }
+  .net-badge{
+    font-family:var(--font-mono); font-size:10.5px; color:var(--jade-light);
+    background:rgba(47,110,75,0.16); border:1px solid rgba(47,110,75,0.45);
+    padding:5px 10px; border-radius:20px; display:flex; align-items:center; gap:6px;
+  }
+
+  .wrap{ max-width:980px; margin:0 auto; padding:30px 24px 80px; }
+
+  .page-head{ display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:22px; flex-wrap:wrap; gap:14px;}
+  .page-head h1{ font-family:var(--font-display); font-weight:600; font-size:26px; margin:0 0 4px; }
+  .page-head p{ margin:0; font-size:13px; color:rgba(246,241,228,0.55); font-family:var(--font-mono); }
+  .btn{
+    padding:12px 18px; border-radius:4px; font-weight:600; font-size:13.5px;
+    display:inline-flex; align-items:center; gap:8px; transition:transform .12s;
+  }
+  .btn:active{ transform:translateY(1px); }
+  .btn-gold{ background:var(--gold); color:var(--ink); }
+  .btn-gold:hover{ background:var(--gold-light); }
+  .btn-outline{ background:transparent; border:1.5px solid rgba(246,241,228,0.3); color:var(--paper); }
+  .btn-outline:hover{ border-color:var(--gold-light); color:var(--gold-light); }
+
+  /* ===== stat row ===== */
+  .stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:26px; }
+  .stat-box{
+    background:var(--bg-3); border:1px solid var(--line); border-radius:10px; padding:16px 18px;
+  }
+  .stat-box b{ display:block; font-family:var(--font-display); font-size:22px; font-weight:600; }
+  .stat-box span{ font-family:var(--font-mono); font-size:10.5px; color:rgba(246,241,228,0.5); text-transform:uppercase; letter-spacing:0.05em; }
+  .stat-box.gold b{ color:var(--gold-light); }
+  .stat-box.jade b{ color:var(--jade-light); }
+  .stat-box.rust b{ color:#e58a76; }
+
+  /* ===== ledger (paper table) ===== */
+  .ledger{
+    background:var(--paper); color:var(--ink); border-radius:10px; overflow:hidden;
+    box-shadow:0 24px 50px -24px rgba(0,0,0,0.55);
+  }
+  .ledger-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 20px; border-bottom:1px dashed rgba(27,27,22,0.2);
+  }
+  .ledger-head h3{ font-family:var(--font-display); font-weight:600; font-size:16px; margin:0; }
+  .ledger-search{
+    font-family:var(--font-mono); font-size:12px; background:var(--paper-2); border:none;
+    padding:8px 12px; border-radius:20px; color:var(--ink); width:160px;
+  }
+  table{ width:100%; border-collapse:collapse; }
+  thead th{
+    text-align:left; font-family:var(--font-mono); font-size:10.5px; letter-spacing:0.06em; text-transform:uppercase;
+    color:var(--ink-soft); padding:10px 20px; border-bottom:1px solid rgba(27,27,22,0.12);
+  }
+  tbody td{
+    padding:13px 20px; font-size:13.5px; border-bottom:1px solid rgba(27,27,22,0.08); vertical-align:middle;
+  }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr:hover{ background:rgba(201,162,39,0.06); }
+  .p-thumb{
+    width:34px; height:34px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center;
+    margin-right:10px; vertical-align:middle; font-size:14px;
+  }
+  .p-name{ font-weight:600; }
+  .p-idx{ font-family:var(--font-mono); font-size:10.5px; color:var(--ink-soft); }
+  .price-cell{ font-family:var(--font-mono); font-size:12.5px; }
+  .pill{
+    font-family:var(--font-mono); font-size:10.5px; letter-spacing:0.04em; text-transform:uppercase;
+    padding:4px 10px; border-radius:20px; display:inline-flex; align-items:center; gap:5px;
+  }
+  .pill.available{ background:var(--jade-light); color:var(--jade); }
+  .pill.sold{ background:var(--rust-light); color:var(--rust); }
+  .row-actions{ display:flex; gap:6px; }
+  .icon-btn{
+    background:var(--paper-2); border:none; border-radius:6px; padding:7px 10px;
+    font-family:var(--font-mono); font-size:11.5px; color:var(--ink);
+  }
+  .icon-btn:hover{ background:var(--paper-3); }
+
+  .ledger-foot{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:12px 20px; font-family:var(--font-mono); font-size:11px; color:var(--ink-soft);
+    border-top:1px dashed rgba(27,27,22,0.2);
+  }
+
+  /* ===== modal shell ===== */
+  .overlay{
+    position:fixed; inset:0; background:rgba(9,10,7,0.72); z-index:50;
+    display:flex; align-items:center; justify-content:center; padding:20px;
+    opacity:0; pointer-events:none; transition:opacity .18s;
+    backdrop-filter:blur(2px);
+  }
+  .overlay.show{ opacity:1; pointer-events:auto; }
+  .modal{
+    background:var(--paper); color:var(--ink); border-radius:14px; width:100%; max-width:420px;
+    padding:24px; transform:translateY(10px); transition:transform .2s;
+    max-height:88vh; overflow-y:auto;
+  }
+  .overlay.show .modal{ transform:translateY(0); }
+  .modal-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+  .modal-head h3{ font-family:var(--font-display); font-weight:600; font-size:18px; margin:0; }
+  .modal-close{ background:none; font-size:18px; color:var(--ink-soft); padding:4px; }
+
+  .field{ margin-bottom:14px; }
+  .field label{ display:block; font-family:var(--font-mono); font-size:10.5px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:6px; }
+  .field input, .field select{
+    width:100%; padding:11px 12px; border-radius:6px; border:1.5px solid rgba(27,27,22,0.18);
+    font-family:var(--font-body); font-size:13.5px; background:var(--paper-2); color:var(--ink);
+  }
+  .field input:focus, .field select:focus{ border-color:var(--gold); outline:none; }
+  .upload-box{
+    border:1.5px dashed rgba(27,27,22,0.28); border-radius:8px; padding:20px; text-align:center;
+    font-family:var(--font-mono); font-size:11.5px; color:var(--ink-soft); cursor:pointer;
+  }
+  .upload-box:hover{ border-color:var(--gold); }
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+  .modal-btn{
+    width:100%; padding:13px; border-radius:6px; font-weight:600; font-size:14px; margin-top:6px;
+  }
+  .modal-btn.primary{ background:var(--ink); color:var(--paper); }
+  .modal-btn.ghost{ background:transparent; border:1.5px solid var(--ink); color:var(--ink); margin-top:8px; }
+
+  /* ===== QR modal ===== */
+  .qr-tag{
+    width:180px; margin:6px auto 16px; background:var(--paper); border:2px solid var(--ink);
+    border-radius:4px; padding:16px 14px; text-align:center; position:relative;
+  }
+  .qr-tag::before{
+    content:""; position:absolute; top:8px; left:50%; transform:translateX(-50%);
+    width:10px; height:10px; border-radius:50%; background:var(--bg);
+    box-shadow:0 0 0 2px var(--paper);
+  }
+  .qr-tag .qt-mark{ font-family:var(--font-mono); font-size:9px; letter-spacing:0.06em; text-transform:uppercase; margin-top:8px; color:var(--ink-soft); }
+  .qr-tag .qt-img{ width:100px; height:100px; margin:10px auto; background:#fff; border-radius:4px; padding:6px; }
+  .qr-tag .qt-name{ font-family:var(--font-display); font-weight:600; font-style:italic; font-size:13px; margin-top:4px; }
+  .qr-tag .qt-idx{ font-family:var(--font-mono); font-size:9.5px; color:var(--ink-soft); margin-top:2px; }
+
+  .toast{
+    position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--ink); color:var(--paper); font-family:var(--font-mono); font-size:12.5px;
+    padding:12px 18px; border-radius:30px; opacity:0; transition:all .25s; z-index:60;
+    display:flex; align-items:center; gap:8px;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  @media (max-width:720px){
+    .stats{ grid-template-columns:1fr 1fr; }
+    thead th:nth-child(4), tbody td:nth-child(4){ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="home.html" class="brand"><span class="brand-mark">CT</span> ChainTrinket<span class="brand-sub">/ admin</span></a>
+  <div class="topbar-right">
+    <div class="net-badge"><span style="width:6px;height:6px;border-radius:50%;background:#5fd694;display:inline-block;"></span> Testnet</div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="page-head">
+    <div>
+      <h1>Produk kamu</h1>
+      <p>trinket_token &middot; mint, cetak QR, dan pantau status penjualan</p>
+    </div>
+    <button class="btn btn-gold" onclick="openModal('mintModal')">+ Produk baru</button>
+  </div>
+
+  <div class="stats">
+    <div class="stat-box"><b id="statTotal">3</b><span>Total token</span></div>
+    <div class="stat-box jade"><b id="statAvail">2</b><span>Tersedia</span></div>
+    <div class="stat-box rust"><b id="statSold">1</b><span>Terjual</span></div>
+    <div class="stat-box gold"><b>Rp 160rb</b><span>Omzet event</span></div>
+  </div>
+
+  <div class="ledger">
+    <div class="ledger-head">
+      <h3>Daftar token</h3>
+      <input class="ledger-search" placeholder="Cari produk...">
+    </div>
+    <table>
+      <thead>
+        <tr><th>Produk</th><th>Harga</th><th>Status</th><th>Pemilik</th><th></th></tr>
+      </thead>
+      <tbody id="ledgerBody">
+        <!-- rows injected by JS -->
+      </tbody>
+    </table>
+    <div class="ledger-foot">
+      <span>Contract <code>CB3K&hellip;T9Q2</code></span>
+      <span id="ledgerCount">3 produk</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Mint Modal ===== -->
+<div class="overlay" id="mintModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Produk baru</h3>
+      <button class="modal-close" onclick="closeModal('mintModal')">&times;</button>
+    </div>
+
+    <div class="field">
+      <label>Foto produk</label>
+      <label class="upload-box" for="photoInput">
+        <div id="uploadPreview">Klik untuk upload foto &middot; JPG/PNG</div>
+      </label>
+      <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="previewPhoto(event)">
+    </div>
+
+    <div class="field">
+      <label>Nama produk</label>
+      <input type="text" id="mintName" placeholder="cth. Gelang Manik Hijau">
+    </div>
+
+    <div class="row2">
+      <div class="field">
+        <label>Harga (Rp)</label>
+        <input type="number" id="mintPriceRp" placeholder="50000">
+      </div>
+      <div class="field">
+        <label>Harga (XLM)</label>
+        <input type="number" id="mintPriceXlm" placeholder="0.5" step="0.1">
+      </div>
+    </div>
+
+    <button class="modal-btn primary" onclick="mintProduct()">Mint &amp; generate QR</button>
+    <button class="modal-btn ghost" onclick="closeModal('mintModal')">Batal</button>
+  </div>
+</div>
+
+<!-- ===== QR Modal ===== -->
+<div class="overlay" id="qrModal">
+  <div class="modal" style="text-align:center;">
+    <div class="modal-head">
+      <h3>QR siap cetak</h3>
+      <button class="modal-close" onclick="closeModal('qrModal')">&times;</button>
+    </div>
+
+    <div class="qr-tag" id="qrTagPreview">
+      <div class="qt-mark">&#9733; ChainTrinket</div>
+      <div class="qt-img">
+        <svg width="100%" height="100%" viewBox="0 0 100 100">
+          <g fill="#0e0f0c">
+            <rect x="6" y="6" width="22" height="22"/><rect x="72" y="6" width="22" height="22"/>
+            <rect x="6" y="72" width="22" height="22"/>
+            <rect x="36" y="6" width="8" height="8"/><rect x="52" y="6" width="8" height="8"/>
+            <rect x="36" y="40" width="28" height="28"/><rect x="72" y="46" width="8" height="8"/>
+            <rect x="86" y="60" width="8" height="8"/><rect x="46" y="80" width="8" height="8"/>
+            <rect x="64" y="88" width="20" height="8"/><rect x="20" y="46" width="8" height="20"/>
+          </g>
+        </svg>
+      </div>
+      <div class="qt-name" id="qrTagName">Gelang Manik Hijau</div>
+      <div class="qt-idx" id="qrTagIdx">Token #4 / 10</div>
+    </div>
+
+    <button class="modal-btn primary" onclick="printTag()">Cetak (4&times;4 cm)</button>
+    <button class="modal-btn ghost" onclick="closeModal('qrModal')">Tutup</button>
+  </div>
+</div>
+
+<div class="toast" id="toast">Token berhasil di-mint</div>
+
+<script>
+  const swatches = ['#c9a227','#2f6e4b','#a13d2b','#5b5748'];
+  let products = [
+    { id:1, name:'Gelang Manik Biru', priceRp:50000, priceXlm:0.5, status:'available', owner:'Toko' },
+    { id:2, name:'Kalung Rantai Emas', priceRp:75000, priceXlm:0.75, status:'sold', owner:'GD67...3F2A' },
+    { id:3, name:'Cincin Ukir Perak', priceRp:35000, priceXlm:0.35, status:'available', owner:'Toko' },
+  ];
+  let nextId = 4;
+
+  function money(n){ return 'Rp ' + n.toLocaleString('id-ID'); }
+
+  function render(){
+    const body = document.getElementById('ledgerBody');
+    body.innerHTML = products.map((p,i)=>`
+      <tr>
+        <td>
+          <span class="p-thumb" style="background:${swatches[i % swatches.length]}22; color:${swatches[i % swatches.length]};">&#9670;</span>
+          <span class="p-name">${p.name}</span><br>
+          <span class="p-idx">Token #${p.id} / 10</span>
+        </td>
+        <td class="price-cell">${money(p.priceRp)}<br><span style="color:#8a8570;">${p.priceXlm} XLM</span></td>
+        <td><span class="pill ${p.status}">${p.status === 'available' ? '&#9679; Tersedia' : '&#9679; Terjual'}</span></td>
+        <td class="price-cell">${p.owner}</td>
+        <td>
+          <div class="row-actions">
+            <button class="icon-btn" onclick="showQr(${p.id})">QR</button>
+            <button class="icon-btn" onclick="toggleStatus(${p.id})">Ubah</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+
+    document.getElementById('statTotal').textContent = products.length;
+    document.getElementById('statAvail').textContent = products.filter(p=>p.status==='available').length;
+    document.getElementById('statSold').textContent = products.filter(p=>p.status==='sold').length;
+    document.getElementById('ledgerCount').textContent = products.length + ' produk';
+  }
+
+  function toggleStatus(id){
+    const p = products.find(x=>x.id===id);
+    p.status = p.status === 'available' ? 'sold' : 'available';
+    p.owner = p.status === 'sold' ? 'GA3K...91XZ' : 'Toko';
+    render();
+  }
+
+  function openModal(id){ document.getElementById(id).classList.add('show'); }
+  function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+
+  function previewPhoto(e){
+    const file = e.target.files[0];
+    if(!file) return;
+    document.getElementById('uploadPreview').textContent = '✓ ' + file.name;
+  }
+
+  function mintProduct(){
+    const name = document.getElementById('mintName').value.trim() || 'Produk Tanpa Nama';
+    const priceRp = parseInt(document.getElementById('mintPriceRp').value) || 0;
+    const priceXlm = parseFloat(document.getElementById('mintPriceXlm').value) || 0;
+
+    const product = { id:nextId++, name, priceRp, priceXlm, status:'available', owner:'Toko' };
+    products.unshift(product);
+    render();
+    closeModal('mintModal');
+
+    document.getElementById('mintName').value = '';
+    document.getElementById('mintPriceRp').value = '';
+    document.getElementById('mintPriceXlm').value = '';
+    document.getElementById('uploadPreview').textContent = 'Klik untuk upload foto · JPG/PNG';
+
+    showToast('Token #' + product.id + ' berhasil di-mint');
+    showQr(product.id);
+  }
+
+  function showQr(id){
+    const p = products.find(x=>x.id===id);
+    document.getElementById('qrTagName').textContent = p.name;
+    document.getElementById('qrTagIdx').textContent = 'Token #' + p.id + ' / 10';
+    openModal('qrModal');
+  }
+
+  function printTag(){
+    window.print();
+  }
+
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 2200);
+  }
+
+  render();
+</script>
+
+</body>
+</html>
