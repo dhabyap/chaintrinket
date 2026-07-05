@@ -301,34 +301,6 @@
     word-break:break-all;
   }
 
-  /* ---------- Demo control dock ---------- */
-  .demo-dock{
-    position:fixed; bottom:14px; right:14px; z-index:40;
-    font-family:var(--font-mono);
-  }
-  .demo-toggle{
-    width:38px; height:38px; border-radius:50%; border:1px solid rgba(246,241,228,0.25);
-    background:var(--bg-2); color:var(--gold-light); font-size:14px;
-  }
-  .demo-panel{
-    position:absolute; bottom:46px; right:0; width:216px;
-    background:var(--bg-2); border:1px solid rgba(246,241,228,0.15);
-    border-radius:10px; padding:12px; display:none;
-    box-shadow:0 14px 30px -10px rgba(0,0,0,0.6);
-  }
-  .demo-panel.show{ display:block; }
-  .demo-panel h4{
-    font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:rgba(246,241,228,0.5);
-    margin:0 0 8px;
-  }
-  .demo-panel button{
-    display:block; width:100%; text-align:left; background:none; border:none;
-    color:var(--paper); font-size:11.5px; padding:6px 4px; border-radius:4px;
-    font-family:var(--font-mono);
-  }
-  .demo-panel button:hover{ background:rgba(246,241,228,0.08); }
-  .demo-note{ font-size:9.5px; color:rgba(246,241,228,0.4); margin-top:6px; line-height:1.4; }
-
   @media (prefers-reduced-motion: reduce){
     *{ transition:none !important; }
   }
@@ -346,7 +318,7 @@
   <!-- ===== Hallmark tag card ===== -->
   <div class="tag-card">
     <div id="stamp" class="stamp available">Verified<br>Available</div>
-    <div class="eyebrow">Hasil scan tag &middot; Token #3 / 10</div>
+    <div id="supplyLabel" class="eyebrow">Hasil scan tag &middot; Token #3 / 10</div>
 
     <div class="art">
       <svg width="150" height="150" viewBox="0 0 150 150" fill="none">
@@ -364,44 +336,36 @@
       </svg>
     </div>
 
-    <h1 class="product-name">Gelang Manik Biru</h1>
+    <h1 id="productName" class="product-name">Gelang Manik Biru</h1>
     <div class="rating"><b>&#9733; 4.8</b> &middot; 12 terjual di event</div>
 
     <div class="price-row">
-      <span class="price-rp">Rp 50.000</span>
-      <span class="price-xlm">&asymp; 0.5 XLM</span>
+      <span id="priceRp" class="price-rp">Rp 50.000</span>
+      <span id="priceXlm" class="price-xlm">&asymp; 0.5 XLM</span>
     </div>
-    <div class="token-idx">trinket_token &middot; id #3</div>
+    <div id="tokenLabel" class="token-idx">trinket_token &middot; id #3</div>
 
     <hr class="divider">
 
     <div class="row-label">Pemilik saat ini</div>
-    <div class="owner-line">
-      <span class="owner-addr">GD67&hellip;3F2A</span>
+    <div id="walletRow" class="owner-line">
+      <span id="ownerAddr" class="owner-addr">GD67&hellip;3F2A</span>
       <button class="copy-btn" onclick="copyAddr()">Salin</button>
     </div>
 
-    <div class="history">
-      <div class="row-label" style="margin-top:16px;">Riwayat kepemilikan</div>
-      <div class="h-item">
-        <span class="h-dot"></span>
-        <div class="h-body">
-          <div class="h-date">01 Jul 2026, 14:02</div>
-          <div class="h-desc">Diterbitkan ke <b>Toko</b> (mint)</div>
-        </div>
-      </div>
+    <div id="historyBody" class="history">
     </div>
 
-    <div class="actions">
-      <button class="btn btn-qris" onclick="openQris()">Bayar dengan QRIS</button>
-      <button class="btn btn-wallet" onclick="openWallet()">Sambungkan Wallet</button>
+    <div id="actions" class="actions">
+      <button id="btnQris" class="btn btn-qris" onclick="openQris()">Bayar dengan QRIS</button>
+      <button id="btnWallet" class="btn btn-wallet" onclick="openSheet('overlayWallet')">Sambungkan Wallet</button>
     </div>
 
     <div class="card-foot">Token pindah otomatis &middot; tercatat selamanya on-chain</div>
   </div>
 
   <div class="contract-foot">
-    Contract <a href="#" onclick="return false;">CB3K&hellip;T9Q2</a> di Stellar Explorer<br>
+    Contract <a id="linkContract" href="#">CB3K&hellip;T9Q2</a> di Stellar Explorer<br>
     Powered by Soroban
   </div>
 </div>
@@ -432,7 +396,7 @@
       </div>
       <div class="status-title">Rp 50.000</div>
       <div class="status-sub">Scan pakai kamera HP kamu — GoPay, OVO, Dana, semua bank support QRIS.</div>
-      <button class="sheet-btn" onclick="simulateQrisPay()">Simulasikan pembayaran berhasil</button>
+      <button class="sheet-btn" onclick="closeSheet('overlayQris')">Tutup</button>
       <button class="sheet-btn secondary" onclick="closeSheet('overlayQris')">Batalkan</button>
     </div>
   </div>
@@ -447,15 +411,15 @@
     </div>
 
     <div id="walletList">
-      <button class="wallet-opt" onclick="connectWallet('Freighter')">
+      <button class="wallet-opt" onclick="handleConnect('Freighter')">
         <span class="wallet-icon" style="background:#7c3aed;">F</span>
         <span><div>Freighter</div><div class="wallet-sub">Ekstensi browser</div></span>
       </button>
-      <button class="wallet-opt" onclick="connectWallet('Lobstr')">
+      <button class="wallet-opt" onclick="handleConnect('Lobstr')">
         <span class="wallet-icon" style="background:#1f7a63;">L</span>
         <span><div>Lobstr</div><div class="wallet-sub">Wallet mobile</div></span>
       </button>
-      <button class="wallet-opt" onclick="connectWallet('xBull')">
+      <button class="wallet-opt" onclick="handleConnect('xBull')">
         <span class="wallet-icon" style="background:#c9a227;">X</span>
         <span><div>xBull</div><div class="wallet-sub">Ekstensi &amp; mobile</div></span>
       </button>
@@ -465,183 +429,177 @@
   </div>
 </div>
 
-<!-- ===== Demo dock — hapus saat sudah tersambung ke backend ===== -->
-<div class="demo-dock">
-  <button class="demo-toggle" onclick="toggleDemo()" aria-label="Demo state">&#9881;</button>
-  <div class="demo-panel" id="demoPanel">
-    <h4>Demo state</h4>
-    <button onclick="setStamp('available')">Set: Available</button>
-    <button onclick="setStamp('sold')">Set: Sold</button>
-    <button onclick="forceWalletError('not_found')">Wallet: not found</button>
-    <button onclick="forceWalletError('rejected')">Wallet: user rejected</button>
-    <button onclick="forceWalletError('insufficient')">Wallet: insufficient balance</button>
-    <div class="demo-note">Panel testing frontend — sembunyikan/hapus pas integrasi Soroban RPC beneran.</div>
-  </div>
-</div>
-
+<script src="https://cdn.jsdelivr.net/npm/@stellar/stellar-sdk@12.3.0/dist/stellar-sdk.min.js"></script>
+<script src="./js/ct.js"></script>
 <script>
-  // ---------- helpers ----------
-  function copyAddr(){
-    navigator.clipboard?.writeText('GD67XJ29QK3F2A');
-    const btn = event.target;
-    const old = btn.textContent;
-    btn.textContent = 'Disalin';
-    setTimeout(()=>btn.textContent = old, 1200);
-  }
+  // ─── read tokenId from URL ───
+  const params = new URLSearchParams(location.search);
+  const TOKEN_ID = parseInt(params.get('id') || '1', 10);
+  const ADMIN_ADDR = 'GA7FSHWRJ2MJ5Y6MKPMORFSDMOWKQTPEREEAQ4AVSJO5ROS3CCEGBJ7X';
 
-  function setStamp(state){
-    const el = document.getElementById('stamp');
-    if(state === 'available'){
-      el.className = 'stamp available';
-      el.innerHTML = 'Verified<br>Available';
-    } else {
-      el.className = 'stamp sold';
-      el.innerHTML = 'Verified<br>Sold';
+  let connectedPubKey = null;
+
+  async function loadProduct() {
+    const s = document.getElementById('stamp');
+    const actions = document.getElementById('actions');
+    const btnQris = document.getElementById('btnQris');
+    const btnWallet = document.getElementById('btnWallet');
+    const walletRow = document.getElementById('walletRow');
+    const addrEl = document.getElementById('ownerAddr');
+    const tokenLabel = document.getElementById('tokenLabel');
+    const supplyLabel = document.getElementById('supplyLabel');
+    const linkContract = document.getElementById('linkContract');
+    const nameEl = document.getElementById('productName');
+    const priceRpEl = document.getElementById('priceRp');
+    const priceXlmEl = document.getElementById('priceXlm');
+
+    try {
+      const info = await CT.getInfo(TOKEN_ID);
+      if (!info) throw new Error('Token tidak ditemukan');
+
+      nameEl.textContent = info.name;
+      priceRpEl.textContent = CT.formatRp(info.price);
+      priceXlmEl.textContent = '≈ ' + CT.formatPrice(info.price);
+      tokenLabel.textContent = `trinket_token · id #${info.id}`;
+
+      const isSold = info.status === 'sold';
+      s.className = `stamp ${isSold ? 'sold' : 'available'}`;
+      s.innerHTML = isSold ? 'Verified<br>Sold' : 'Verified<br>Available';
+
+      addrEl.textContent = CT.shortAddr(info.owner);
+      addrEl.dataset.full = info.owner;
+
+      // history
+      const ts = info.created_at;
+      const d = new Date(ts * 1000);
+      const dateStr = d.toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' }) + ', ' + d.toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
+      document.getElementById('historyBody').innerHTML = `
+        <div class="h-item">
+          <span class="h-dot"></span>
+          <div class="h-body">
+            <div class="h-date">${dateStr}</div>
+            <div class="h-desc">Diterbitkan ke <b>${CT.shortAddr(info.owner)}</b> (mint)</div>
+          </div>
+        </div>
+      `;
+
+      walletRow.style.display = isSold ? 'none' : 'flex';
+      actions.style.display = isSold ? 'none' : 'flex';
+
+      linkContract.textContent = CT.shortAddr('CATZRF3HW437XOCX42NWDWZ6WRZ2IHFWBQSGMQPX3EGCKGE4B765XIEP');
+      linkContract.href = 'https://stellar.expert/explorer/testnet/contract/CATZRF3HW437XOCX42NWDWZ6WRZ2IHFWBQSGMQPX3EGCKGE4B765XIEP';
+
+      const sup = await CT.totalSupply();
+      supplyLabel.textContent = `Token #${TOKEN_ID} / ${sup}`;
+    } catch(e) {
+      console.error('loadProduct error:', e);
+      s.className = 'stamp sold';
+      s.innerHTML = 'Error<br>Offline';
     }
   }
 
-  function toggleDemo(){
-    document.getElementById('demoPanel').classList.toggle('show');
-  }
-
-  function openSheet(id){ document.getElementById(id).classList.add('show'); }
-  function closeSheet(id){
+  // ─── Wallet connect real ───
+  function openSheet(id) { document.getElementById(id).classList.add('show'); }
+  function closeSheet(id) {
     document.getElementById(id).classList.remove('show');
-    // reset wallet sheet back to list view
-    if(id === 'overlayWallet'){
-      setTimeout(()=>{
+    if (id === 'overlayWallet') {
+      setTimeout(() => {
         document.getElementById('walletList').style.display = 'block';
         document.getElementById('walletFlow').style.display = 'none';
         document.getElementById('walletFlow').innerHTML = '';
       }, 220);
     }
-    if(id === 'overlayQris'){
-      setTimeout(()=>{
-        document.getElementById('qrisBody').innerHTML = document.getElementById('qrisBody').dataset.original || document.getElementById('qrisBody').innerHTML;
-      }, 220);
-    }
   }
 
-  function openQris(){
-    const body = document.getElementById('qrisBody');
-    if(!body.dataset.original) body.dataset.original = body.innerHTML;
-    else body.innerHTML = body.dataset.original;
-    openSheet('overlayQris');
-  }
-
-  function simulateQrisPay(){
-    document.getElementById('qs2').classList.add('active');
-    const body = document.getElementById('qrisBody');
-    body.innerHTML = `
-      <div class="status-icon pending" id="qStatusIcon">&#9203;</div>
-      <div class="status-title">Memproses pembayaran&hellip;</div>
-      <div class="status-sub">Menunggu konfirmasi &amp; memindahkan token di Soroban.</div>
-    `;
-    setTimeout(()=>{
-      document.getElementById('qStatusIcon').className = 'status-icon success';
-      document.getElementById('qStatusIcon').innerHTML = '&#10003;';
-      body.querySelector('.status-title').textContent = 'Gelang ini milik kamu! 🎉';
-      body.querySelector('.status-sub').textContent = 'Bukti kepemilikan digital sudah tercatat on-chain. Ambil barang langsung di lapak.';
-      body.insertAdjacentHTML('beforeend', `
-        <div class="mono-hash">tx: 4f9a...c22e &middot; block #184203</div>
-        <button class="sheet-btn" onclick="closeSheet('overlayQris'); setStamp('sold')">Selesai</button>
-      `);
-    }, 1400);
-  }
-
-  function openWallet(){
-    document.getElementById('walletList').style.display = 'block';
-    document.getElementById('walletFlow').style.display = 'none';
-    openSheet('overlayWallet');
-  }
-
-  let pendingErrorOverride = null;
-  function forceWalletError(type){
-    pendingErrorOverride = type;
-    toggleDemo();
-  }
-
-  function connectWallet(name){
+  async function handleConnect(walletName) {
     document.getElementById('walletList').style.display = 'none';
     const flow = document.getElementById('walletFlow');
     flow.style.display = 'block';
 
-    if(pendingErrorOverride === 'not_found'){
-      flow.innerHTML = errorBlock(
-        'Wallet tidak ditemukan',
-        `${name} belum terpasang di browser kamu. Install ekstensinya lalu coba lagi.`,
-        () => connectWallet(name)
-      );
-      pendingErrorOverride = null;
-      return;
-    }
-
-    flow.innerHTML = `
-      <div class="status-icon pending" id="wIcon">&#128268;</div>
-      <div class="status-title">Menghubungkan ${name}&hellip;</div>
-      <div class="status-sub">Konfirmasi koneksi di popup ${name}.</div>
-    `;
-
-    setTimeout(()=>{
-      if(pendingErrorOverride === 'rejected'){
-        flow.innerHTML = errorBlock(
-          'Koneksi ditolak',
-          `Kamu menolak permintaan di popup ${name}. Sambungkan ulang untuk lanjut beli.`,
-          () => connectWallet(name)
-        );
-        pendingErrorOverride = null;
+    try {
+      if (walletName === 'Freighter') {
+        flow.innerHTML = `<div class="status-icon pending">&#128268;</div><div class="status-title">Menghubungkan Freighter&hellip;</div><div class="status-sub">Konfirmasi koneksi di popup Freighter.</div>`;
+        connectedPubKey = await CT.connectFreighter();
+      } else {
+        flow.innerHTML = `<div class="status-icon fail">&#10007;</div><div class="status-title">${walletName} belum support</div><div class="status-sub">Gunakan Freighter dulu untuk demo ini.</div><button class="sheet-btn secondary" onclick="closeSheet('overlayWallet')">Tutup</button>`;
         return;
       }
 
       flow.innerHTML = `
         <div class="status-icon success"><span>&#10003;</span></div>
-        <div class="status-title">${name} tersambung</div>
-        <div class="status-sub">GA3K&hellip;91XZ &middot; konfirmasi pembayaran 0.5 XLM untuk token #3.</div>
-        <button class="sheet-btn" onclick="confirmWalletPay('${name}')">Konfirmasi &amp; bayar</button>
+        <div class="status-title">${walletName} tersambung</div>
+        <div class="status-sub">${CT.shortAddr(connectedPubKey)} &middot; konfirmasi pembayaran ${CT.formatPrice(await CT.getInfo(TOKEN_ID).then(i=>i.price))} untuk token #${TOKEN_ID}.</div>
+        <button class="sheet-btn" onclick="confirmTransfer()">Konfirmasi &amp; bayar</button>
         <button class="sheet-btn secondary" onclick="closeSheet('overlayWallet')">Batalkan</button>
       `;
-    }, 1100);
+    } catch(e) {
+      flow.innerHTML = `
+        <div class="status-icon fail"><span>&#10007;</span></div>
+        <div class="status-title">Koneksi ditolak</div>
+        <div class="err-box"><span>&#9888;&#65039;</span><span>${e.message || 'Freighter tidak merespon.'}</span></div>
+        <button class="sheet-btn retry" onclick="handleConnect('${walletName}')">Coba lagi</button>
+        <button class="sheet-btn secondary" onclick="closeSheet('overlayWallet')">Tutup</button>
+      `;
+    }
   }
 
-  function confirmWalletPay(name){
+  async function confirmTransfer() {
     const flow = document.getElementById('walletFlow');
+    flow.innerHTML = `<div class="status-icon pending">&#9203;</div><div class="status-title">Memproses&hellip;</div><div class="status-sub">Transaksi dikirim ke Stellar testnet.</div>`;
 
-    if(pendingErrorOverride === 'insufficient'){
-      flow.innerHTML = errorBlock(
-        'Saldo tidak cukup',
-        `Saldo wallet kamu kurang dari 0.5 XLM (+ network fee). Top up dulu, lalu coba lagi.`,
-        () => confirmWalletPay(name)
-      );
-      pendingErrorOverride = null;
-      return;
-    }
-
-    flow.innerHTML = `
-      <div class="status-icon pending"><span>&#9203;</span></div>
-      <div class="status-title">Pending&hellip;</div>
-      <div class="status-sub">Transaksi sedang diproses di Stellar testnet.</div>
-    `;
-    setTimeout(()=>{
+    try {
+      const result = await CT.transfer(connectedPubKey, ADMIN_ADDR, TOKEN_ID);
+      const hash = result.hash ? result.hash.slice(0, 4) + '…' + result.hash.slice(-4) : 'pending';
       flow.innerHTML = `
         <div class="status-icon success"><span>&#10003;</span></div>
-        <div class="status-title">Token masuk ke wallet kamu</div>
+        <div class="status-title">Token #${TOKEN_ID} milik kamu!</div>
         <div class="status-sub">Tunjukin bukti ini ke seller buat ambil barang langsung.</div>
-        <div class="mono-hash">tx: 8b1d...e047 &middot; block #184207</div>
-        <button class="sheet-btn" onclick="closeSheet('overlayWallet'); setStamp('sold')">Selesai</button>
+        <div class="mono-hash">tx: ${hash}</div>
+        <button class="sheet-btn" onclick="location.reload()">Selesai</button>
       `;
-    }, 1300);
+    } catch(e) {
+      flow.innerHTML = `
+        <div class="status-icon fail"><span>&#10007;</span></div>
+        <div class="status-title">Transaksi gagal</div>
+        <div class="err-box"><span>&#9888;&#65039;</span><span>${e.message || 'Coba lagi.'}</span></div>
+        <button class="sheet-btn retry" onclick="confirmTransfer()">Coba lagi</button>
+        <button class="sheet-btn secondary" onclick="closeSheet('overlayWallet')">Tutup</button>
+      `;
+    }
   }
 
-  function errorBlock(title, msg, retryFn){
-    window.__retry = retryFn;
-    return `
-      <div class="status-icon fail"><span>&#10007;</span></div>
-      <div class="status-title">${title}</div>
-      <div class="err-box"><span>&#9888;&#65039;</span><span>${msg}</span></div>
-      <button class="sheet-btn retry" onclick="window.__retry()">Coba lagi</button>
-      <button class="sheet-btn secondary" onclick="closeSheet('overlayWallet')">Tutup</button>
+  // ─── QRIS fallback (simulate — needs backend) ───
+  function openQris() {
+    const body = document.getElementById('qrisBody');
+    body.innerHTML = `
+      <div class="status-icon pending">&#9203;</div>
+      <div class="status-title">QRIS belum aktif</div>
+      <div class="status-sub">Integrasi payment gateway (Midtrans/Xendit) menyusul tahap berikutnya.</div>
+      <button class="sheet-btn secondary" onclick="closeSheet('overlayQris')">Tutup</button>
     `;
+    openSheet('overlayQris');
   }
+
+  // ─── copy helpers ───
+  function copyAddr() {
+    const el = document.getElementById('ownerAddr');
+    const full = el.dataset.full || el.textContent;
+    navigator.clipboard?.writeText(full);
+    const btn = event.target;
+    const old = btn.textContent;
+    btn.textContent = 'Disalin';
+    setTimeout(() => btn.textContent = old, 1200);
+  }
+
+  // ─── wire globals so onclick works ───
+  window.openSheet = openSheet;
+  window.closeSheet = closeSheet;
+  window.handleConnect = handleConnect;
+  window.copyAddr = copyAddr;
+  window.openQris = openQris;
+
+  // ─── init ───
+  loadProduct();
 </script>
 
 </body>

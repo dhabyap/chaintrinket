@@ -308,98 +308,95 @@
 
 <div class="toast" id="toast">Token berhasil di-mint</div>
 
+<script src="https://cdn.jsdelivr.net/npm/@stellar/stellar-sdk@12.3.0/dist/stellar-sdk.min.js"></script>
+<script src="./js/ct.js"></script>
 <script>
+  const ADMIN = CT.CONFIG.admin;
   const swatches = ['#c9a227','#2f6e4b','#a13d2b','#5b5748'];
-  let products = [
-    { id:1, name:'Gelang Manik Biru', priceRp:50000, priceXlm:0.5, status:'available', owner:'Toko' },
-    { id:2, name:'Kalung Rantai Emas', priceRp:75000, priceXlm:0.75, status:'sold', owner:'GD67...3F2A' },
-    { id:3, name:'Cincin Ukir Perak', priceRp:35000, priceXlm:0.35, status:'available', owner:'Toko' },
-  ];
-  let nextId = 4;
 
-  function money(n){ return 'Rp ' + n.toLocaleString('id-ID'); }
+  async function loadDashboard() {
+    try {
+      const supply = await CT.totalSupply();
+      let soldCount = 0, totalRev = 0;
+      const rows = [];
+      for (let i = 1; i <= supply; i++) {
+        try {
+          const t = await CT.getInfo(i);
+          if (!t) continue;
+          if (t.status === 'sold') soldCount++;
+          rows.push(t);
+        } catch(e) {}
+      }
+      document.getElementById('statTotal').textContent = rows.length;
+      document.getElementById('statAvail').textContent = rows.filter(r => r.status === 'available').length;
+      document.getElementById('statSold').textContent = soldCount;
+      document.getElementById('statRp').textContent = Rp
+(rows.reduce((s, t) => s + Math.round(Number(t.price) / 10_000_000 * 17500), 0).toLocaleString('id-ID'));
+      renderLedger(rows);
+    } catch(e) {
+      document.getElementById('statTotal').textContent = '0';
+      console.error('loadDashboard', e);
+    }
+  }
 
-  function render(){
+  function renderLedger(tokens) {
     const body = document.getElementById('ledgerBody');
-    body.innerHTML = products.map((p,i)=>`
+    if (!tokens.length) { body.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#888;">Belum ada token</td></tr>'; return; }
+    body.innerHTML = tokens.map((p, i) => `
       <tr>
         <td>
           <span class="p-thumb" style="background:${swatches[i % swatches.length]}22; color:${swatches[i % swatches.length]};">&#9670;</span>
           <span class="p-name">${p.name}</span><br>
           <span class="p-idx">Token #${p.id} / 10</span>
         </td>
-        <td class="price-cell">${money(p.priceRp)}<br><span style="color:#8a8570;">${p.priceXlm} XLM</span></td>
+        <td class="price-cell">${CT.formatRp(p.price)}<br><span style="color:#8a8570;">${CT.formatPrice(p.price)}</span></td>
         <td><span class="pill ${p.status}">${p.status === 'available' ? '&#9679; Tersedia' : '&#9679; Terjual'}</span></td>
-        <td class="price-cell">${p.owner}</td>
+        <td class="price-cell">${CT.shortAddr(p.owner)}</td>
         <td>
           <div class="row-actions">
-            <button class="icon-btn" onclick="showQr(${p.id})">QR</button>
-            <button class="icon-btn" onclick="toggleStatus(${p.id})">Ubah</button>
+            <button class="icon-btn" onclick="showQr(${p.id},'${p.name}')">QR</button>
           </div>
         </td>
       </tr>
     `).join('');
-
-    document.getElementById('statTotal').textContent = products.length;
-    document.getElementById('statAvail').textContent = products.filter(p=>p.status==='available').length;
-    document.getElementById('statSold').textContent = products.filter(p=>p.status==='sold').length;
-    document.getElementById('ledgerCount').textContent = products.length + ' produk';
+    document.getElementById('ledgerCount').textContent = tokens.length + ' produk';
   }
 
-  function toggleStatus(id){
-    const p = products.find(x=>x.id===id);
-    p.status = p.status === 'available' ? 'sold' : 'available';
-    p.owner = p.status === 'sold' ? 'GA3K...91XZ' : 'Toko';
-    render();
+  async function mintProduct() {
+    const name = document.getElementById('mintName').value.trim();
+    if (!name) return alert('Nama produk wajib');
+    const priceXlm = parseFloat(document.getElementById('mintPriceXlm').value);
+    if (!priceXlm || priceXlm <= 0) return alert('Harga XLM wajib');
+    const price = Math.round(priceXlm * 10_000_000);
+    const metaUri = document.getElementById('mintMetaUri').value.trim() || 'ipfs://QmPending';
+    try {
+      const pubKey = await CT.connectFreighter();
+      if (pubKey !== ADMIN) return alert('Hanya admin yang bisa mint');
+      showToast('Mengirim mint tx...');
+      const res = await CT.mint(pubKey, name, metaUri, price);
+      showToast('Mint berhasil! Hash: ' + (res.hash || '').slice(0, 12));
+      closeModal('mintModal');
+      setTimeout(loadDashboard, 3000);
+    } catch(e) { alert('Gagal: ' + e.message); }
   }
 
   function openModal(id){ document.getElementById(id).classList.add('show'); }
   function closeModal(id){ document.getElementById(id).classList.remove('show'); }
 
-  function previewPhoto(e){
-    const file = e.target.files[0];
-    if(!file) return;
-    document.getElementById('uploadPreview').textContent = '✓ ' + file.name;
-  }
-
-  function mintProduct(){
-    const name = document.getElementById('mintName').value.trim() || 'Produk Tanpa Nama';
-    const priceRp = parseInt(document.getElementById('mintPriceRp').value) || 0;
-    const priceXlm = parseFloat(document.getElementById('mintPriceXlm').value) || 0;
-
-    const product = { id:nextId++, name, priceRp, priceXlm, status:'available', owner:'Toko' };
-    products.unshift(product);
-    render();
-    closeModal('mintModal');
-
-    document.getElementById('mintName').value = '';
-    document.getElementById('mintPriceRp').value = '';
-    document.getElementById('mintPriceXlm').value = '';
-    document.getElementById('uploadPreview').textContent = 'Klik untuk upload foto · JPG/PNG';
-
-    showToast('Token #' + product.id + ' berhasil di-mint');
-    showQr(product.id);
-  }
-
-  function showQr(id){
-    const p = products.find(x=>x.id===id);
-    document.getElementById('qrTagName').textContent = p.name;
-    document.getElementById('qrTagIdx').textContent = 'Token #' + p.id + ' / 10';
+  function showQr(id, name) {
+    document.getElementById('qrTagName').textContent = name || 'Produk';
+    document.getElementById('qrTagIdx').textContent = 'Token #' + id;
+    document.getElementById('qrLink').href = 'product.html?id=' + id;
     openModal('qrModal');
   }
-
-  function printTag(){
-    window.print();
-  }
-
-  function showToast(msg){
+  function showToast(msg) {
     const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(()=>t.classList.remove('show'), 2200);
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
   }
+  function printTag() { window.print(); }
 
-  render();
+  loadDashboard();
 </script>
 
 </body>
