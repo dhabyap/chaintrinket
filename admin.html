@@ -314,18 +314,22 @@
   const admin = CT.CONFIG.admin;
   const swatches = ['#c9a227','#2f6e4b','#a13d2b','#5b5748'];
 
+  function previewPhoto(e){
+    var el=document.getElementById('uploadPreview');
+    if(e.target.files&&e.target.files[0])el.innerHTML='<span style="color:var(--jade);">\u2713 '+e.target.files[0].name+'</span>';
+  }
+
   async function loadDashboard() {
     try {
-      const supply = await CT.totalSupply();
-      let soldCount = 0, totalRev = 0;
+      let soldCount = 0;
       const rows = [];
-      for (let i = 1; i <= supply; i++) {
+      for (let i = 1; ; i++) {
         try {
           const t = await CT.getInfo(i);
-          if (!t) continue;
+          if (!t) break;
           if (t.status === 'sold') soldCount++;
           rows.push(t);
-        } catch(e) {}
+        } catch(e) { break; }
       }
       document.getElementById('statTotal').textContent = rows.length;
       document.getElementById('statAvail').textContent = rows.filter(r => r.status === 'available').length;
@@ -367,7 +371,7 @@
     const priceXlm = parseFloat(document.getElementById('mintPriceXlm').value);
     if (!priceXlm || priceXlm <= 0) return alert('Harga XLM wajib');
     const price = Math.round(priceXlm * 10_000_000);
-    const metaUri = document.getElementById('mintMetaUri').value.trim() || 'ipfs://QmPending';
+    const metaUri = 'ipfs://QmPending';
     try {
       const pubKey = await CT.connectFreighter();
       if (pubKey !== admin) return alert('Hanya admin yang bisa mint');
