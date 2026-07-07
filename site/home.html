@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ChainTrinket — Fashion on-chain</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0e0f0c;
+    --bg-2:#15160f;
+    --bg-3:#1c1e14;
+    --paper:#f6f1e4;
+    --paper-2:#ece4d0;
+    --ink:#1b1b16;
+    --ink-soft:#5b5748;
+    --gold:#c9a227;
+    --gold-light:#e4c767;
+    --jade:#2f6e4b;
+    --jade-light:#dceae1;
+    --rust:#a13d2b;
+    --rust-light:#f1dcd3;
+    --line:rgba(246,241,228,0.12);
+    --font-display:'Fraunces', serif;
+    --font-body:'Space Grotesk', sans-serif;
+    --font-mono:'JetBrains Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--bg); color:var(--paper);
+    font-family:var(--font-body); -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  ::selection{ background:var(--gold); color:var(--ink); }
+  a{ color:inherit; text-decoration:none; }
+  button{ font-family:inherit; cursor:pointer; border:none; }
+  :focus-visible{ outline:2px solid var(--gold-light); outline-offset:3px; }
+  .container{ max-width:1080px; margin:0 auto; padding:0 24px; }
+  section{ position:relative; }
+
+  /* ===== texture / background ===== */
+  body::before{
+    content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+    background:
+      radial-gradient(circle at 12% 8%, rgba(201,162,39,0.10), transparent 45%),
+      radial-gradient(circle at 90% 15%, rgba(47,110,75,0.14), transparent 40%),
+      radial-gradient(circle at 50% 95%, rgba(161,61,43,0.08), transparent 45%);
+  }
+
+  /* ===== nav ===== */
+  nav{
+    position:sticky; top:0; z-index:30;
+    background:rgba(14,15,12,0.82); backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-inner{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 24px; max-width:1080px; margin:0 auto;
+  }
+  .brand{ display:flex; align-items:center; gap:9px; font-family:var(--font-display); font-weight:700; font-size:18px; }
+  .brand-mark{
+    width:26px; height:26px; border-radius:50%; border:1.5px solid var(--gold);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-mono); font-size:10.5px; font-weight:600; color:var(--gold-light);
+  }
+  .nav-cta{
+    font-family:var(--font-mono); font-size:12px; letter-spacing:0.04em;
+    background:var(--gold); color:var(--ink); padding:9px 16px; border-radius:20px; font-weight:600;
+  }
+  .nav-cta:hover{ background:var(--gold-light); }
+
+  /* ===== hero ===== */
+  .hero{ padding:76px 0 60px; position:relative; z-index:1; }
+  .hero-inner{ display:grid; grid-template-columns:1.1fr 0.9fr; gap:48px; align-items:center; }
+  .eyebrow{
+    font-family:var(--font-mono); font-size:11.5px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--jade-light); display:flex; align-items:center; gap:8px; margin-bottom:18px;
+  }
+  .eyebrow .dot{ width:6px; height:6px; border-radius:50%; background:#5fd694; box-shadow:0 0 0 3px rgba(95,214,148,0.18); }
+  h1.headline{
+    font-family:var(--font-display); font-weight:600; font-size:52px; line-height:1.06;
+    margin:0 0 18px; letter-spacing:-0.01em;
+  }
+  h1.headline em{ font-style:italic; color:var(--gold-light); font-weight:500; }
+  .sub{ font-size:16px; color:rgba(246,241,228,0.72); line-height:1.65; max-width:440px; margin-bottom:30px; }
+  .hero-ctas{ display:flex; gap:12px; flex-wrap:wrap; }
+  .btn{
+    padding:14px 22px; border-radius:4px; font-weight:600; font-size:14px;
+    display:inline-flex; align-items:center; gap:8px; transition:transform .15s, box-shadow .15s;
+  }
+  .btn:active{ transform:translateY(1px); }
+  .btn-primary{ background:var(--paper); color:var(--ink); }
+  .btn-primary:hover{ box-shadow:0 6px 0 0 rgba(246,241,228,0.18); transform:translateY(-2px); }
+  .btn-ghost{ background:transparent; color:var(--paper); border:1.5px solid rgba(246,241,228,0.35); }
+  .btn-ghost:hover{ border-color:var(--gold-light); color:var(--gold-light); }
+
+  /* hero tag visual */
+  .hero-visual{ display:flex; justify-content:center; }
+  .hang-tag{
+    width:230px; background:var(--paper); color:var(--ink); border-radius:3px;
+    padding:22px 18px 20px; position:relative;
+    box-shadow:0 30px 60px -20px rgba(0,0,0,0.65);
+    transform:rotate(4deg);
+    animation:sway 5s ease-in-out infinite;
+  }
+  @keyframes sway{
+    0%,100%{ transform:rotate(4deg); }
+    50%{ transform:rotate(-2deg); }
+  }
+  .hang-tag::before{
+    content:""; position:absolute; top:-34px; left:50%; transform:translateX(-1px);
+    width:1.5px; height:36px; background:rgba(246,241,228,0.3);
+  }
+  .hang-tag::after{
+    content:""; position:absolute; top:12px; left:50%; transform:translateX(-50%);
+    width:12px; height:12px; border-radius:50%; background:var(--bg);
+    box-shadow:0 0 0 3px var(--paper), inset 0 2px 3px rgba(0,0,0,0.5);
+  }
+  .ht-body{ margin-top:14px; text-align:center; }
+  .ht-qr{
+    width:100px; height:100px; margin:12px auto; background:#fff; border-radius:4px; padding:8px;
+  }
+  .ht-name{ font-family:var(--font-display); font-weight:600; font-style:italic; font-size:16px; margin:6px 0 2px; }
+  .ht-price{ font-family:var(--font-mono); font-size:12px; color:var(--ink-soft); }
+  .ht-stamp{
+    margin-top:12px; display:inline-flex; align-items:center; gap:5px;
+    font-family:var(--font-mono); font-size:9.5px; letter-spacing:0.06em; text-transform:uppercase;
+    color:var(--jade); border:1px solid var(--jade); border-radius:20px; padding:4px 10px;
+  }
+
+  /* ===== problem/solution ===== */
+  .split{ padding:64px 0; }
+  .split-head{ text-align:center; max-width:560px; margin:0 auto 44px; }
+  .split-head .kicker{
+    font-family:var(--font-mono); font-size:11px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--gold-light); margin-bottom:10px;
+  }
+  .split-head h2{ font-family:var(--font-display); font-weight:600; font-size:32px; margin:0; line-height:1.2; }
+  .cards{ display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
+  .card{
+    background:var(--bg-3); border:1px solid var(--line); border-radius:10px; padding:22px;
+  }
+  .card .tag{
+    font-family:var(--font-mono); font-size:10px; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--rust); background:rgba(161,61,43,0.14); border:1px solid rgba(161,61,43,0.4);
+    display:inline-block; padding:4px 9px; border-radius:20px; margin-bottom:12px;
+  }
+  .card.good .tag{ color:var(--jade-light); background:rgba(47,110,75,0.16); border-color:rgba(47,110,75,0.45); }
+  .card h3{ font-size:15.5px; margin:0 0 6px; font-weight:600; }
+  .card p{ font-size:13.5px; color:rgba(246,241,228,0.62); line-height:1.6; margin:0; }
+
+  /* ===== how it works (tabs) ===== */
+  .how{ padding:70px 0 60px; }
+  .tabs{
+    display:flex; justify-content:center; gap:8px; margin-bottom:38px;
+  }
+  .tab-btn{
+    background:var(--bg-3); border:1px solid var(--line); color:rgba(246,241,228,0.65);
+    padding:10px 18px; border-radius:24px; font-size:13px; font-weight:600; font-family:var(--font-body);
+    transition:all .15s;
+  }
+  .tab-btn.active{ background:var(--gold); color:var(--ink); border-color:var(--gold); }
+
+  .lane{ display:none; }
+  .lane.active{ display:grid; }
+  .lane{ grid-template-columns:repeat(4,1fr); gap:14px; }
+  .step{
+    background:var(--bg-3); border:1px solid var(--line); border-radius:10px; padding:20px 16px;
+    position:relative;
+  }
+  .step .num{
+    font-family:var(--font-mono); font-size:11px; color:var(--gold-light);
+    letter-spacing:0.06em; margin-bottom:10px; display:block;
+  }
+  .step h4{ font-size:14px; margin:0 0 6px; font-weight:600; }
+  .step p{ font-size:12.5px; color:rgba(246,241,228,0.6); line-height:1.55; margin:0; }
+  .lane-foot{
+    text-align:center; margin-top:22px; font-family:var(--font-mono); font-size:12px; color:rgba(246,241,228,0.5);
+  }
+
+  /* ===== stats strip ===== */
+  .strip{
+    border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+    padding:30px 0; background:var(--bg-2);
+  }
+  .strip-inner{ display:flex; justify-content:space-between; flex-wrap:wrap; gap:20px; }
+  .stat{ text-align:left; }
+  .stat b{ display:block; font-family:var(--font-display); font-size:26px; font-weight:600; color:var(--gold-light); }
+  .stat span{ font-family:var(--font-mono); font-size:11px; color:rgba(246,241,228,0.55); text-transform:uppercase; letter-spacing:0.06em; }
+
+  /* ===== seller callout (unused — admin internal) ===== */
+  /* ===== footer ===== */
+  footer{ padding:50px 0 40px; border-top:1px solid var(--line); }
+  .foot-inner{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; }
+  .foot-mono{ font-family:var(--font-mono); font-size:11.5px; color:rgba(246,241,228,0.45); }
+  .net-badge{
+    font-family:var(--font-mono); font-size:10.5px; letter-spacing:0.06em;
+    color:var(--jade-light); background:rgba(47,110,75,0.16); border:1px solid rgba(47,110,75,0.45);
+    padding:5px 10px; border-radius:20px; display:inline-flex; align-items:center; gap:6px;
+  }
+
+  @media (max-width: 860px){
+    .hero-inner{ grid-template-columns:1fr; }
+    .hero-visual{ order:-1; margin-bottom:10px; }
+    h1.headline{ font-size:38px; }
+    .cards{ grid-template-columns:1fr; }
+    .lane{ grid-template-columns:1fr 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .hang-tag{ animation:none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="brand"><span class="brand-mark">CT</span> ChainTrinket</div>
+    <div style="display:flex; gap:10px; align-items:center;">
+      <a href="catalog.html" style="font-family:var(--font-mono); font-size:12px; color:rgba(246,241,228,0.6);">Katalog</a>
+      <a href="admin.html" style="font-family:var(--font-mono); font-size:12px; color:rgba(246,241,228,0.35);">Admin</a>
+      <a class="nav-cta" href="#how">Cara belanja &rarr;</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="container hero-inner">
+    <div>
+      <div class="eyebrow"><span class="dot"></span> Live di event crypto &middot; Stellar Testnet</div>
+      <h1 class="headline">Aksesoris fisik,<br><em>bukti kepemilikan</em><br>on-chain.</h1>
+      <p class="sub">Gelang, kalung, cincin — tiap barang punya satu token di Stellar. Scan tag-nya, lihat siapa pemiliknya, dan bawa pulang langsung dari lapak. Gak perlu paham crypto buat mulai.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href="#how">Lihat cara belanja</a>
+        <a class="btn btn-ghost" href="catalog.html">Lihat katalog</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hang-tag">
+        <div class="ht-body">
+          <div class="ht-qr">
+            <svg width="100%" height="100%" viewBox="0 0 100 100">
+              <g fill="#0e0f0c">
+                <rect x="6" y="6" width="22" height="22"/><rect x="72" y="6" width="22" height="22"/>
+                <rect x="6" y="72" width="22" height="22"/>
+                <rect x="36" y="6" width="8" height="8"/><rect x="52" y="6" width="8" height="8"/>
+                <rect x="36" y="40" width="28" height="28"/><rect x="72" y="46" width="8" height="8"/>
+                <rect x="86" y="60" width="8" height="8"/><rect x="46" y="80" width="8" height="8"/>
+                <rect x="64" y="88" width="20" height="8"/><rect x="20" y="46" width="8" height="20"/>
+              </g>
+            </svg>
+          </div>
+          <div class="ht-name">Gelang Manik Biru</div>
+          <div class="ht-price">0.5 XLM</div>
+          <div class="ht-stamp">&#10003; Verified &middot; #3/10</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PROBLEM / SOLUTION ===== -->
+<section class="split">
+  <div class="container">
+    <div class="split-head">
+      <div class="kicker">Kenapa ChainTrinket</div>
+      <h2>Barang second di event susah dipercaya —<br>sekarang ada buktinya.</h2>
+    </div>
+    <div class="cards">
+      <div class="card">
+        <span class="tag">Sebelum</span>
+        <h3>Gak ada cara verifikasi keaslian</h3>
+        <p>Pembeli ragu beli aksesoris second karena gak ada riwayat kepemilikan yang bisa dicek.</p>
+      </div>
+      <div class="card good">
+        <span class="tag">Sesudah</span>
+        <h3>Riwayat tercatat, bisa dicek siapa saja</h3>
+        <p>Scan QR di barang → langsung lihat pemilik saat ini dan riwayat lengkapnya di chain.</p>
+      </div>
+      <div class="card">
+        <span class="tag">Sebelum</span>
+        <h3>Penjual mikro gak punya sistem kepemilikan</h3>
+        <p>Sulit bangun trust ke pembeli tanpa sistem pencatatan yang kredibel.</p>
+      </div>
+      <div class="card good">
+        <span class="tag">Sesudah</span>
+        <h3>Mint sekali, token urus sisanya</h3>
+        <p>Upload foto &amp; harga, sistem generate QR — kepemilikan pindah otomatis pas terjual.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section class="how" id="how">
+  <div class="container">
+    <div class="split-head">
+      <div class="kicker">Cara belanja</div>
+      <h2>Dua jalur — sama-sama 4 langkah.</h2>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showLane('awam', event)">Pembeli awam &middot; QRIS</button>
+      <button class="tab-btn" onclick="showLane('crypto', event)">Pembeli crypto &middot; Wallet</button>
+    </div>
+
+    <div class="lane active" id="lane-awam">
+      <div class="step"><span class="num">01</span><h4>Scan tag</h4><p>Pakai kamera HP, gak perlu install apa-apa.</p></div>
+      <div class="step"><span class="num">02</span><h4>Lihat detail</h4><p>Foto, harga, dan status barang muncul langsung.</p></div>
+      <div class="step"><span class="num">03</span><h4>Bayar QRIS</h4><p>GoPay, OVO, Dana, atau m-banking — seperti biasa.</p></div>
+      <div class="step"><span class="num">04</span><h4>Ambil barang</h4><p>Notif kepemilikan masuk, tunjukin ke seller, bawa pulang.</p></div>
+    </div>
+
+    <div class="lane" id="lane-crypto">
+      <div class="step"><span class="num">01</span><h4>Scan tag</h4><p>Atau buka link dari story/social media event.</p></div>
+      <div class="step"><span class="num">02</span><h4>Connect wallet</h4><p>Freighter, Lobstr, atau xBull — pilih salah satu.</p></div>
+      <div class="step"><span class="num">03</span><h4>Konfirmasi XLM</h4><p>Bayar dengan XLM atau USDC langsung dari wallet.</p></div>
+      <div class="step"><span class="num">04</span><h4>Token masuk wallet</h4><p>Tunjukin bukti di HP, ambil barang di tempat — gak perlu kirim.</p></div>
+    </div>
+
+    <div class="lane-foot">Token pindah otomatis di kontrak <code>trinket_token</code> begitu pembayaran terverifikasi.</div>
+  </div>
+</section>
+
+<!-- ===== STATS STRIP ===== -->
+<section class="strip">
+  <div class="container strip-inner">
+    <div class="stat"><b>10</b><span>Token diterbitkan</span></div>
+    <div class="stat"><b>&lt;30s</b><span>Waktu bayar QRIS</span></div>
+    <div class="stat"><b>&lt;0.01</b><span>XLM gas per transaksi</span></div>
+    <div class="stat"><b>100%</b><span>Riwayat on-chain</span></div>
+  </div>
+</section>
+
+<!-- ===== (seller section dihapus — admin internal) ===== -->
+
+<footer>
+  <div class="container foot-inner">
+    <div class="foot-mono">ChainTrinket &middot; Fashion on-chain<br>Contract <code>trinket_token</code> &middot; Soroban SDK</div>
+    <div class="net-badge"><span style="width:6px;height:6px;border-radius:50%;background:#5fd694;display:inline-block;"></span> Stellar Testnet</div>
+  </div>
+</footer>
+
+<script>
+  function showLane(name, e){
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    e.target.classList.add('active');
+    document.getElementById('lane-awam').classList.toggle('active', name==='awam');
+    document.getElementById('lane-crypto').classList.toggle('active', name==='crypto');
+  }
+</script>
+
+</body>
+</html>

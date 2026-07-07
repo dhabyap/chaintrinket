@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChainTrinket - Deploy Ulang</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0d0f14;color:#e0e4ec;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;display:flex;min-height:100vh;align-items:center;justify-content:center}
+  .card{background:#14181e;border-radius:16px;padding:32px;max-width:520px;width:100%;border:1px solid #2a3038}
+  .logo{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+  .logo-icon{width:40px;height:40px;border-radius:10px;background:#f5c842;color:#0d0f14;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px}
+  h1{font-size:20px;margin-bottom:4px}
+  .sub{color:#8a929e;font-size:14px;margin-bottom:24px}
+  .info-block{background:#1a1f26;border-radius:12px;padding:16px;margin-bottom:20px;font-size:14px;line-height:1.8}
+  .info-block .label{color:#8a929e;display:inline-block;width:80px}
+  .info-block .val{color:#e0e4ec}
+  .highlight{color:#f5c842}
+  .section-label{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#8a929e;margin-bottom:8px;margin-top:20px}
+  .wallet-box{background:#1a1f26;border:1px dashed #3a424c;border-radius:12px;padding:14px;word-break:break-all;font-size:13px;margin-bottom:16px;min-height:44px}
+  .btn{display:block;width:100%;padding:14px;border-radius:12px;border:none;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:10px;transition:.2s}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .btn-connect{background:#2a3038;color:#e0e4ec;border:1px solid #4a525e}
+  .btn-connect:hover:not(:disabled){background:#3a424c}
+  .btn-connect.ok{background:#1a3a2a;border-color:#2ecc71;color:#2ecc71}
+  .btn-deploy{background:#f5c842;color:#0d0f14}
+  .btn-deploy:hover:not(:disabled){background:#ffdb5c}
+  .error{background:#3a1a1a;border:1px solid #e74c3c;color:#e74c3c;border-radius:12px;padding:14px;font-size:14px;margin-bottom:10px}
+  .pending{background:#1a2a3a;border:1px solid #3498db;color:#3498db;border-radius:12px;padding:14px;font-size:14px;margin-bottom:10px}
+  .success{background:#1a3a2a;border:1px solid #2ecc71;color:#2ecc71;border-radius:12px;padding:14px;font-size:14px;margin-bottom:10px}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">
+    <div class="logo-icon">CT</div>
+    <div>
+      <h1>Deploy ulang</h1>
+      <div class="sub">Contract lama pake admin address beda. Deploy baru biar admin = wallet kamu.</div>
+    </div>
+  </div>
+
+  <div class="info-block">
+    <div><span class="label">WASM:</span><span class="val">trinket_token.optimized <span class="highlight">(4.5 KB)</span></span></div>
+    <div><span class="label">Network:</span><span class="val highlight">Testnet</span></div>
+    <div><span class="label">RPC:</span><span class="val">https://soroban-testnet.stellar.org</span></div>
+  </div>
+
+  <div class="section-label">WALLET ADMIN (FREIGHTER)</div>
+  <div class="wallet-box" id="walletBox">Klik tombol Connect di bawah</div>
+
+  <button class="btn btn-connect" id="connectBtn" onclick="connectWallet()">1. Connect Freighter</button>
+  <div id="status"></div>
+  <button class="btn btn-deploy" id="deployBtn" onclick="deployContract()" disabled>2. Deploy contract baru</button>
+  <div id="result"></div>
+</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@stellar/stellar-sdk@16.0.1/dist/stellar-sdk.min.js"></script>
+  <script>console.log('SDK loaded, Address.toScVal:', typeof StellarSdk.Address.prototype.toScVal);</script>
+<script src="https://cdn.jsdelivr.net/npm/@stellar/freighter-api@6.0.1/build/index.min.js"></script>
+<script>
+window.SS = StellarSdk;
+  const RPC = 'https://soroban-testnet.stellar.org';
+  const NET = 'Test SDF Network ; September 2015';
+  const HORIZON = 'https://horizon-testnet.stellar.org';
+  const server = new SS.rpc.Server(RPC);
+  let adminAddr = null;
+  const WASM_HASH = '12b104072b510de401dd8b035facb666a768b2c3ae881ca461802169488a8d8e';
+
+  function hexToBytes(hex) {
+    const bytes = new Uint8Array(hex.length / 2);
+    for (let i = 0; i < hex.length; i += 2)
+      bytes[i / 2] = parseInt(hex.substr(i, 2), 16);
+    return bytes;
+  }
+
+  async function connectWallet() {
+    const st = document.getElementById('status');
+    try {
+      if (!window.freighterApi) throw new Error('Freighter tidak terinstall');
+      const result = await window.freighterApi.requestAccess();
+      adminAddr = result.address || result;
+      document.getElementById('walletBox').textContent = adminAddr;
+      document.getElementById('connectBtn').textContent = '✓ Freighter tersambung';
+      document.getElementById('connectBtn').className = 'btn btn-connect ok';
+      document.getElementById('deployBtn').disabled = false;
+      st.innerHTML = '';
+      st.className = '';
+    } catch(e) {
+      st.className = 'error';
+      st.innerHTML = '✗ Gagal: ' + e.message;
+    }
+  }
+
+  async function deployContract() {
+    const st = document.getElementById('status');
+    const deployBtn = document.getElementById('deployBtn');
+    const resultDiv = document.getElementById('result');
+    deployBtn.disabled = true;
+    deployBtn.textContent = 'Memproses...';
+
+    try {
+      st.textContent = '\u23F3 Cek sequence account...';
+      st.className = 'pending';
+
+      // Small delay to let Horizon index the new account
+      await new Promise(r => setTimeout(r, 2000));
+      // Ambil sequence dari Horizon (account klasik)
+      const horizResp = await fetch(HORIZON + '/accounts/' + adminAddr);
+      if (!horizResp.ok) {
+        // Retry once after short wait
+        await new Promise(r => setTimeout(r, 2000));
+        const retryResp = await fetch(HORIZON + '/accounts/' + adminAddr);
+        if (!retryResp.ok) throw new Error('Account tidak ditemukan di testnet. Isi dulu via friendbot.');
+        const horizData = await retryResp.json();
+        const seq = horizData.sequence;
+        const acc = new SS.Account(adminAddr, seq);
+      } else {
+        const horizData = await horizResp.json();
+        const seq = horizData.sequence;
+        const acc = new SS.Account(adminAddr, seq);
+      }
+
+      st.textContent = '\u23F3 Bikin transaksi deploy...';
+
+      const wasmId = hexToBytes(WASM_HASH);
+      const salt = crypto.getRandomValues(new Uint8Array(32));
+
+      const deployOp = SS.Operation.createCustomContract({
+        wasmHash: wasmId,
+        addressSalt: salt,
+        constructorName: 'init',
+        constructorArgs: [(() => {
+          const pk = SS.xdr.PublicKey.publicKeyTypeEd25519(SS.StrKey.decodeEd25519PublicKey(adminAddr));
+          return SS.xdr.ScVal.scvAddress(SS.xdr.ScAddress.scAddressTypeAccount(pk));
+        })()]
+      });
+
+      const tx = new SS.TransactionBuilder(acc, {
+        fee: '100000',
+        networkPassphrase: NET
+      }).addOperation(deployOp).setTimeout(60).build();
+
+      st.textContent = '\u23F3 Simulasi transaksi...';
+      const prep = await server.prepareTransaction(tx);
+
+      st.textContent = '\u23F3 Konfirmasi di Freighter...';
+      const { signedTxXdr } = await window.freighterApi.signTransaction(prep.toXDR(), {
+        networkPassphrase: NET,
+        address: adminAddr
+      });
+
+      st.textContent = '\u23F3 Submit ke network...';
+      const sendRes = await server.sendTransaction(SS.TransactionBuilder.fromXDR(signedTxXdr, NET));
+
+      if (sendRes.status === 'PENDING') {
+        st.textContent = '\u23F3 Nunggu konfirmasi...';
+        for (let i = 0; i < 60; i++) {
+          await new Promise(r => setTimeout(r, 2000));
+          const getRes = await server.getTransaction(sendRes.hash);
+          if (getRes.status === 'SUCCESS') {
+            st.className = 'success';
+            st.innerHTML = '\u2713 Contract deployed!';
+            deployBtn.textContent = 'Berhasil!';
+            deployBtn.disabled = true;
+
+            let contractId = null;
+            try {
+              const txMeta = SS.xdr.TransactionMeta.fromXDR(getRes.resultMetaXdr, 'base64');
+              const ops = txMeta.v3().operations();
+              for (const op of ops) {
+                for (const change of op.changes()) {
+                  const cd = change.contractData();
+                  if (cd && cd.contract().contractId()) {
+                    contractId = SS.StrKey.encodeContract(cd.contract().contractId());
+                    break;
+                  }
+                }
+                if (contractId) break;
+              }
+            } catch(e) { console.warn('extract contractId error', e); }
+            if (!contractId) {
+              contractId = SS.StrKey.encodeContract(
+                SS.hash(
+                  (() => {
+                    const a = SS.hash(salt);
+                    const b = SS.StrKey.decodeEd25519PublicKey(adminAddr);
+                    const c = new Uint8Array(a.length + b.length);
+                    c.set(a, 0); c.set(b, a.length);
+                    return c;
+                  })()
+                )
+              );
+            }
+            resultDiv.innerHTML = `
+              <div class="success" style="margin-top:12px">
+                <strong>Contract ID:</strong><br>
+                <code style="font-size:13px;word-break:break-all">${contractId}</code>
+              </div>
+              <p style="color:#8a929e;font-size:14px;margin-top:8px">
+                Contract sudah deploy + init dengan admin wallet kamu.<br>
+                Buka <strong>admin.html</strong> untuk mulai mint produk.
+              </p>
+            `;
+            return;
+          }
+          if (getRes.status === 'FAILED') throw new Error('Transaksi gagal. Cek kontrak.');
+        }
+        throw new Error('Timeout nunggu konfirmasi.');
+      } else {
+        throw new Error('Status: ' + sendRes.status);
+      }
+    } catch(e) {
+      st.className = 'error';
+      st.innerHTML = '&#10007; Gagal: ' + e.message;
+      deployBtn.disabled = false;
+      deployBtn.textContent = 'Coba lagi';
+    }
+  }
+  window.connectWallet = connectWallet;
+  window.deployContract = deployContract;
+</script>
+</body>
+</html>
