@@ -1,0 +1,6 @@
+node_modules/
+contracts/trinket_token/target/
+*.wasm
+*.lock
+.DS_Store
+site/node_modules/
