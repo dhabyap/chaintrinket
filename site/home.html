@@ -238,6 +238,38 @@
   }
 
   .nav-links{ display:flex; gap:6px; align-items:center; }
+  /* Hamburger */
+  .hamburger{
+    display:none; flex-direction:column; gap:4px; cursor:pointer;
+    background:none; border:none; padding:4px;
+  }
+  .hamburger span{
+    display:block; width:20px; height:2px; border-radius:2px;
+    background:var(--paper); transition:all .2s;
+  }
+  .hamburger.active span:nth-child(1){ transform:rotate(45deg) translate(4px,4px); }
+  .hamburger.active span:nth-child(2){ opacity:0; }
+  .hamburger.active span:nth-child(3){ transform:rotate(-45deg) translate(4px,-4px); }
+  .mobile-drawer{
+    display:none; position:fixed; top:56px; right:0; z-index:40;
+    background:rgba(14,15,12,0.96); backdrop-filter:blur(12px);
+    border-left:1px solid var(--line); border-bottom:1px solid var(--line);
+    padding:16px 20px; min-width:200px;
+    flex-direction:column; gap:4px;
+    transform:translateX(100%); transition:transform .22s ease;
+  }
+  .mobile-drawer.open{ transform:translateX(0); }
+  .mobile-drawer a, .mobile-drawer button{
+    padding:12px 14px; border-radius:8px; font-size:14px; text-align:left;
+    color:var(--paper); text-decoration:none;
+  }
+  .mobile-drawer a:hover, .mobile-drawer button:hover{ background:rgba(246,241,228,0.08); }
+  .mobile-drawer .lang-toggle{ border:none; background:transparent; margin-bottom:4px; }
+  .mobile-drawer .nav-cta{
+    background:var(--gold); color:var(--ink); text-align:center; font-weight:600;
+    margin-top:8px; border-radius:20px;
+  }
+
   @media (max-width: 860px){
     .hero-inner{ grid-template-columns:1fr; }
     .hero-visual{ order:-1; margin-bottom:10px; }
@@ -246,6 +278,8 @@
     .lane{ grid-template-columns:1fr 1fr; }
   }
   @media (max-width: 600px){
+    .nav-links{ display:none; }
+    .hamburger, .mobile-drawer{ display:flex; }
     h1.headline{ font-size:28px; }
     .sub{ font-size:14px; }
     .container{ padding:0 16px; }
@@ -294,8 +328,18 @@
       <a href="admin.html" data-i18n="nav.admin" style="font-family:var(--font-mono); font-size:12px; color:rgba(246,241,228,0.35);">Admin</a>
       <a class="nav-cta" href="#how" data-i18n="nav.how">How to buy →</a>
     </div>
+    <button class="hamburger" id="hamBtn" onclick="toggleMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
+<div class="mobile-drawer" id="mobileDrawer">
+  <button class="lang-toggle" onclick="I18N.toggle();toggleMenu()">ID</button>
+  <a href="catalog.html" data-i18n="nav.catalog" onclick="toggleMenu()">Catalog</a>
+  <a href="my-items.html" data-i18n="nav.myItems" onclick="toggleMenu()">My Items</a>
+  <a href="admin.html" data-i18n="nav.admin" onclick="toggleMenu()">Admin</a>
+  <a class="nav-cta" href="#how" data-i18n="nav.how" onclick="toggleMenu()">How to buy →</a>
+</div>
 
 <!-- ===== HERO ===== -->
 <section class="hero">
@@ -446,6 +490,19 @@
 </footer>
 
 <script>
+  // Hamburger menu
+  function toggleMenu(){
+    const d=document.getElementById('mobileDrawer');
+    document.getElementById('hamBtn').classList.toggle('active');
+    d.classList.toggle('open');
+  }
+  document.addEventListener('click',function(e){
+    const d=document.getElementById('mobileDrawer');
+    if(d.classList.contains('open') && !d.contains(e.target) && e.target.id!=='hamBtn'){
+      toggleMenu();
+    }
+  });
+
   function showLane(name, e){
     document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
     e.target.classList.add('active');
