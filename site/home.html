@@ -278,8 +278,8 @@
     .lane{ grid-template-columns:1fr 1fr; }
   }
   @media (max-width: 600px){
-    .nav-links{ display:none; }
-    .hamburger, .mobile-drawer{ display:flex; }
+    .nav-links{ display: none !important; }
+    .hamburger, .mobile-drawer{ display: flex !important; }
     h1.headline{ font-size:28px; }
     .sub{ font-size:14px; }
     .container{ padding:0 16px; }
@@ -297,8 +297,6 @@
     .stat b{ font-size:20px; }
   }
   @media (max-width: 480px){
-    .nav-links a:not(.nav-cta){ font-size:10px !important; padding:4px 6px; }
-    .nav-links{ gap:3px; }
     .nav-inner{ padding:10px 14px; }
     .brand{ font-size:15px; gap:6px; }
     .brand-mark{ width:22px; height:22px; font-size:9px; }
