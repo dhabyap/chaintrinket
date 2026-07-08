@@ -781,7 +781,17 @@
     const fb = document.getElementById('walletFlow');
     fb.style.display = 'block';
     fb.innerHTML = '<div style="text-align:center;padding:18px;font-size:14px;color:var(--ink-soft);">' + I18N.t('admin.sell.confirm') + '</div>';
+    // If user clicked a demo-error button from demo dock, throw override
+    if (pendingErrorOverride) {
+      const errMsg = pendingErrorOverride;
+      pendingErrorOverride = null;
+      setTimeout(() => {
+        fb.innerHTML = '<div class="err-box"><span>⚠</span><span>Demo: ' + errMsg + '</span></div><button class="sheet-btn retry" onclick="handleConnect(\'' + name + '\')">' + I18N.t('btn.retry') + '</button>';
+      }, 600);
+      return;
+    }
     try {
+      if (!window.freighterApi) throw new Error(I18N.t('product.wallet.notfound') || 'Freighter not installed');
       const addr = await CT.connectFreighter();
       connectedPubKey = addr;
       fb.innerHTML = `

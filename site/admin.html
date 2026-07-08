@@ -665,6 +665,7 @@
     if (!priceXlm || priceXlm <= 0) return alert(I18N.t('admin.alert.priceReq'));
     const price = Math.round(priceXlm * 10_000_000);
     try {
+      if (!window.freighterApi) throw new Error('Freighter tidak terinstall — install dari freighter.app');
       const pubKey = await CT.connectFreighter();
       if (pubKey !== admin) return alert(I18N.t('admin.alert.adminOnly'));
       showToast(I18N.t('admin.sell.preparing'));
@@ -710,6 +711,7 @@
     statusEl.innerHTML = '<div style="text-align:center;padding:10px;font-size:13px;color:var(--ink-soft);">' + I18N.t('admin.sell.preparing') + '</div>';
 
     try {
+      if (!window.freighterApi) throw new Error('Freighter tidak terinstall — install dari freighter.app');
       const pubKey = await CT.connectFreighter();
       if (pubKey !== admin) {
         statusEl.innerHTML = '<div class="err-box"><span>⚠</span><span>' + I18N.t('admin.sell.adminOnly') + '</span></div>';
@@ -761,6 +763,7 @@
   // Check if contract needs init
   async function checkInit() {
     try {
+      if (!window.freighterApi) throw new Error();
       const a = await CT._sim('get_admin', []);
       if (a === CT.CONFIG.admin) return;
     } catch(e) {

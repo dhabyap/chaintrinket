@@ -114,6 +114,7 @@ const I18N = (() => {
     'product.wallet.freighter.sub': { id: 'Ekstensi browser', en: 'Browser extension' },
     'product.wallet.lobstr.sub':   { id: 'Wallet mobile',   en: 'Mobile wallet' },
     'product.wallet.xbull.sub':    { id: 'Ekstensi & mobile', en: 'Extension & mobile' },
+    'product.wallet.notfound': { id: 'Freighter tidak terinstall. Install dari freighter.app', en: 'Freighter not installed. Get it at freighter.app' },
 
     'product.error.offline': { id: 'Error<br>Offline', en: 'Error<br>Offline' },
 
