@@ -237,12 +237,43 @@
     padding:5px 10px; border-radius:20px; display:inline-flex; align-items:center; gap:6px;
   }
 
+  .nav-links{ display:flex; gap:6px; align-items:center; }
   @media (max-width: 860px){
     .hero-inner{ grid-template-columns:1fr; }
     .hero-visual{ order:-1; margin-bottom:10px; }
     h1.headline{ font-size:38px; }
     .cards{ grid-template-columns:1fr; }
     .lane{ grid-template-columns:1fr 1fr; }
+  }
+  @media (max-width: 600px){
+    h1.headline{ font-size:28px; }
+    .sub{ font-size:14px; }
+    .container{ padding:0 16px; }
+    .hero{ padding:50px 0 40px; }
+    .hang-tag{ width:180px; padding:16px 14px 14px; transform:rotate(2deg); }
+    .ht-qr{ width:76px; height:76px; }
+    .split{ padding:44px 0; }
+    .split-head h2{ font-size:24px; }
+    .how{ padding:50px 0 40px; }
+    .lane{ grid-template-columns:1fr; }
+    .tabs{ flex-wrap:wrap; }
+    .tab-btn{ font-size:12px; padding:8px 14px; }
+    .strip-inner{ gap:12px; }
+    .stat{ flex:1; min-width:calc(50% - 8px); text-align:center; }
+    .stat b{ font-size:20px; }
+  }
+  @media (max-width: 480px){
+    .nav-links a:not(.nav-cta){ font-size:10px !important; padding:4px 6px; }
+    .nav-links{ gap:3px; }
+    .nav-inner{ padding:10px 14px; }
+    .brand{ font-size:15px; gap:6px; }
+    .brand-mark{ width:22px; height:22px; font-size:9px; }
+    h1.headline{ font-size:24px; }
+    .eyebrow{ font-size:10px; }
+    .btn{ padding:12px 16px; font-size:13px; }
+    .stat b{ font-size:18px; }
+    footer{ padding:30px 0 24px; }
+    .foot-inner{ flex-direction:column; text-align:center; }
   }
   @media (prefers-reduced-motion: reduce){
     .hang-tag{ animation:none; }
@@ -256,7 +287,7 @@
 <nav>
   <div class="nav-inner">
     <div class="brand"><span class="brand-mark">CT</span> ChainTrinket</div>
-    <div style="display:flex; gap:10px; align-items:center;">
+    <div class="nav-links" style="display:flex; gap:10px; align-items:center;">
       <button class="lang-toggle" onclick="I18N.toggle()">ID</button>
       <a href="catalog.html" data-i18n="nav.catalog" style="font-family:var(--font-mono); font-size:12px; color:rgba(246,241,228,0.6);">Catalog</a>
       <a href="my-items.html" data-i18n="nav.myItems" style="font-family:var(--font-mono); font-size:12px; color:rgba(246,241,228,0.6);">My Items</a>

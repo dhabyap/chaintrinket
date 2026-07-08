@@ -298,6 +298,28 @@
     word-break:break-all;
   }
 
+  @media (max-width: 480px){
+    .wrap{ padding:14px 12px 60px; }
+    .brand{ font-size:16px; }
+    .topbar{ flex-wrap:wrap; gap:6px; }
+    .tag-card{ padding:18px 14px 16px; }
+    .art{ width:130px; height:130px; margin:10px auto 0; }
+    .art svg{ width:130px; height:130px; }
+    .product-name{ font-size:22px; }
+    .stamp{ width:60px; height:60px; font-size:8.5px; top:14px; right:10px; }
+    .owner-addr{ font-size:12px; padding:5px 8px; }
+    .btn{ font-size:13.5px; padding:13px 14px; }
+    .sheet{ max-width:100%; border-radius:14px 14px 0 0; }
+    .overlay[style*="align-items:flex-end"] { align-items:flex-end !important; }
+  }
+  @media (max-width: 380px){
+    .brand{ font-size:14px; letter-spacing:0; }
+    .topbar > div{ flex-wrap:wrap; justify-content:flex-end; gap:4px; }
+    .product-name{ font-size:19px; }
+    .art{ width:100px; height:100px; }
+    .art svg{ width:100px; height:100px; }
+    .stamp{ width:50px; height:50px; font-size:7px; top:10px; right:6px; }
+  }
   @media (prefers-reduced-motion: reduce){
     *{ transition:none !important; }
   }
