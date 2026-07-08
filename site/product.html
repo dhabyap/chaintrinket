@@ -298,6 +298,28 @@
     word-break:break-all;
   }
 
+  /* Social Proof */
+  .social-proof{
+    margin:16px 0; padding:12px 14px;
+    background:var(--paper); border-radius:8px;
+    font-size:12px; color:var(--ink-soft);
+  }
+  .sp-top{ display:flex; align-items:center; gap:7px; margin-bottom:8px; font-weight:500; }
+  .sp-pulse{
+    width:6px; height:6px; border-radius:50%; background:#22c55e;
+    animation:pulse-dot 2s infinite;
+  }
+  @keyframes pulse-dot{ 0%{opacity:1} 50%{opacity:0.3} 100%{opacity:1} }
+  .sp-feed{ display:flex; flex-direction:column; gap:4px; }
+  .sp-item{
+    display:flex; align-items:center; gap:6px; font-size:11.5px;
+    font-family:var(--font-mono); color:var(--ink-soft);
+  }
+  .sp-item .dot{ width:4px; height:4px; border-radius:50%; flex-shrink:0; }
+  .sp-item .dot.bought{ background:var(--jade); }
+  .sp-item .dot.view{ background:var(--gold-light); }
+  .sp-time{ color:rgba(91,87,72,0.55); margin-left:auto; font-size:10px; }
+
   /* Hamburger */
   .hamburger{
     display:none; flex-direction:column; gap:4px; cursor:pointer;
@@ -354,7 +376,7 @@
     *{ transition:none !important; }
   }
 </style>
-</head>
+<script>if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js");</script></head>
 <body>
 
 <div class="wrap">
@@ -413,6 +435,12 @@
     </div>
 
     <div id="historyBody" class="history"></div>
+
+    <!-- Social Proof -->
+    <div id="socialProof" class="social-proof">
+      <div class="sp-top"><span class="sp-pulse"></span> <span id="viewerCount">0</span> <span data-i18n="product.viewing">viewing now</span></div>
+      <div id="activityFeed" class="sp-feed"></div>
+    </div>
 
     <div id="actions" class="actions">
       <button id="btnQris" class="btn btn-qris" onclick="openQris()" data-i18n="product.buy.qris">Pay with QRIS</button>
@@ -632,6 +660,40 @@
   });
 
   loadProduct();
+
+  // Social Proof — simulate viewer count + recent activity
+  (function initSocialProof(){
+    // Random viewer count 3–9
+    var count = Math.floor(Math.random()*7)+3;
+    document.getElementById('viewerCount').textContent = count;
+
+    // Simulate viewer count fluctuation
+    setInterval(function(){
+      var delta = Math.random()>0.5 ? 1 : -1;
+      count = Math.max(2, Math.min(12, count + delta));
+      document.getElementById('viewerCount').textContent = count;
+    }, 8000);
+
+    // Recent activity feed (simulated)
+    var feed = document.getElementById('activityFeed');
+    var names = ['GD67…3F2A','GB28…9D1C','CAF2…7B4E','GD91…2X5F','FA12…8Q3J'];
+    var actions = ['bought','view','view','view'];
+    function addActivity(){
+      var name = names[Math.floor(Math.random()*names.length)];
+      var act = actions[Math.floor(Math.random()*actions.length)];
+      var item = document.createElement('div');
+      item.className = 'sp-item';
+      item.innerHTML = '<span class=\"dot '+act+'\"></span> '
+        + (act==='bought' ? '<b>'+name+'</b> bought' : name+' viewed')
+        + ' <span class=\"sp-time\">just now</span>';
+      feed.insertBefore(item, feed.firstChild);
+      if(feed.children.length > 5) feed.removeChild(feed.lastChild);
+    }
+    // Seed with some activity
+    addActivity(); addActivity();
+    setInterval(addActivity, 12000 + Math.random()*8000);
+  })();
+
   I18N.apply();
 </script>
 

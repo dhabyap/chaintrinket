@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="./js/i18n.js"></script>
+<script>if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js');</script>
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -186,6 +187,36 @@
     padding:10px 12px; font-size:12px; margin:10px 0; text-align:center;
   }
 
+  /* Receipt Modal */
+  .receipt{
+    background:var(--paper); border-radius:16px; overflow:hidden;
+    max-width:360px; width:100%;
+  }
+  .receipt-head{
+    background:var(--bg); color:var(--paper); padding:22px 20px; text-align:center;
+  }
+  .receipt-head .brand-mark{
+    width:36px; height:36px; border-radius:50%; border:2px solid var(--gold);
+    display:inline-flex; align-items:center; justify-content:center;
+    font-family:var(--font-mono); font-size:14px; font-weight:600; color:var(--gold-light);
+    margin-bottom:8px;
+  }
+  .receipt-head h2{ font-family:var(--font-display); font-weight:600; font-size:18px; margin:0; }
+  .receipt-head p{ font-size:12px; color:rgba(246,241,228,0.5); margin:4px 0 0; font-family:var(--font-mono); }
+  .receipt-body{ padding:20px; }
+  .receipt-row{ display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(27,27,22,0.08); font-size:13px; }
+  .receipt-row:last-child{ border:none; }
+  .receipt-row .lbl{ color:var(--ink-soft); }
+  .receipt-row .val{ font-weight:600; text-align:right; word-break:break-all; }
+  .receipt-qr{
+    width:120px; height:120px; margin:16px auto 0; background:#fff;
+    padding:8px; border-radius:8px; display:flex; align-items:center; justify-content:center;
+  }
+  .receipt-actions{ display:flex; gap:8px; padding:0 20px 20px; }
+  .receipt-actions .btn{ flex:1; padding:12px; border-radius:8px; font-weight:600; font-size:13px; text-align:center; }
+  .btn-share{ background:var(--gold); color:var(--ink); }
+  .btn-dl{ background:var(--bg); color:var(--paper); }
+
   @media (max-width:600px){
     .nav-links{ display: none !important; }
     .hamburger, .mobile-drawer{ display: flex !important; }
@@ -252,6 +283,23 @@
     <div id="transferStatus" style="display:none;"></div>
     <button class="modal-btn primary" id="transferBtn" onclick="doTransfer()" data-i18n="myItems.transfer">Transfer</button>
     <button class="modal-btn ghost" onclick="closeTransferModal()" data-i18n="btn.cancel">Cancel</button>
+  </div>
+</div>
+
+<!-- Receipt Modal -->
+<div class="overlay" id="receiptOverlay">
+  <div class="receipt" id="receiptContent">
+    <div class="receipt-head">
+      <div class="brand-mark">CT</div>
+      <h2 data-i18n="myItems.receipt.title">Ownership Receipt</h2>
+      <p>ChainTrinket · <span data-i18n="net.testnet">Stellar Testnet</span></p>
+    </div>
+    <div class="receipt-body" id="receiptBody"></div>
+    <div id="receiptQr" class="receipt-qr"></div>
+    <div class="receipt-actions">
+      <button class="btn btn-share" onclick="shareReceipt()" data-i18n="myItems.receipt.share">Share</button>
+      <button class="btn btn-dl" onclick="downloadReceipt()" data-i18n="myItems.receipt.dl">Save</button>
+    </div>
   </div>
 </div>
 
@@ -379,6 +427,9 @@
                 </div>
                 <div className="item-price">{formatPrice(t.price)}</div>
                 <div className="item-actions">
+                  <button className="btn-sm btn-ghost" onClick={() => showReceipt(t)}>
+                    {I18N.t('myItems.share') || 'Share'}
+                  </button>
                   <button className="btn-sm btn-gold" onClick={() => openTransfer(t.id)}>
                     {I18N.t('myItems.transfer') || 'Transfer'}
                   </button>
@@ -438,6 +489,66 @@
     if(d.classList.contains('open') && !d.contains(e.target) && e.target.id!=='hamBtn'){
       toggleMenu();
     }
+  });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script>
+  // Receipt functions
+  var _receiptData = null;
+
+  window.showReceipt = function(t) {
+    _receiptData = t;
+    var body = document.getElementById('receiptBody');
+    body.innerHTML = '';
+    var rows = [
+      { lbl: I18N.t('myItems.receipt.item')||'Item', val: t.name },
+      { lbl: I18N.t('myItems.receipt.id')||'Token ID', val: '#'+t.id },
+      { lbl: I18N.t('myItems.receipt.price')||'Price', val: (Number(t.price)/10_000_000).toFixed(2)+' XLM' },
+      { lbl: I18N.t('myItems.receipt.owner')||'Owner', val: (t.owner||'').slice(0,6)+'…'+(t.owner||'').slice(-4) },
+    ];
+    rows.forEach(function(r) {
+      var div = document.createElement('div');
+      div.className = 'receipt-row';
+      div.innerHTML = '<span class="lbl">'+r.lbl+'</span><span class="val">'+r.val+'</span>';
+      body.appendChild(div);
+    });
+
+    // QR code
+    var qrDiv = document.getElementById('receiptQr');
+    qrDiv.innerHTML = '';
+    var url = window.location.origin + '/product.html?id=' + t.id;
+    try { new QRCode(qrDiv, { text: url, width: 104, height: 104, colorDark: '#0e0f0c', colorLight: '#fff', correctLevel: QRCode.CorrectLevel.H }); } catch(e) {
+      qrDiv.innerHTML = '<div style="font-size:11px;color:var(--ink-soft);">QR: '+url+'</div>';
+    }
+
+    document.getElementById('receiptOverlay').classList.add('show');
+  };
+
+  window.shareReceipt = function() {
+    if (navigator.share && _receiptData) {
+      navigator.share({
+        title: 'ChainTrinket - '+_receiptData.name,
+        text: 'I own '+_receiptData.name+' on ChainTrinket! (Token #'+_receiptData.id+')',
+        url: window.location.origin+'/product.html?id='+_receiptData.id
+      }).catch(function(){});
+    } else {
+      // Fallback: copy link
+      var url = window.location.origin+'/product.html?id='+_receiptData.id;
+      navigator.clipboard.writeText(url).then(function(){
+        alert(I18N.t('myItems.receipt.copied')||'Link copied!');
+      }).catch(function(){});
+    }
+  };
+
+  window.downloadReceipt = function() {
+    var el = document.getElementById('receiptContent');
+    // Simple screenshot via html2canvas not available — fallback print
+    window.print();
+  };
+
+  // Close overlay on click outside
+  document.getElementById('receiptOverlay').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('show');
   });
 </script>
 

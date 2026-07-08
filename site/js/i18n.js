@@ -99,7 +99,8 @@ const I18N = (() => {
     'product.supply':    { id: 'Hasil scan tag · Token #{{i}} / {{n}}', en: 'Tag scan result · Token #{{i}} / {{n}}' },
     'product.rating':    { id: '★ 4.8 · 12 terjual di event', en: '★ 4.8 · 12 sold at events' },
     'product.tokenId':   { id: 'trinket_token · id #{{i}}', en: 'trinket_token · id #{{i}}' },
-    'product.owner':     { id: 'Pemilik saat ini', en: 'Current owner' },
+    'product.owner':       { id: 'Pemilik saat ini',  en: 'Current owner' },
+    'product.viewing':     { id: 'sedang lihat sekarang', en: 'viewing now' },
     'product.history.mint': { id: 'Diterbitkan ke {{addr}} (mint)', en: 'Issued to {{addr}} (mint)' },
     'product.buy.qris':  { id: 'Bayar dengan QRIS', en: 'Pay with QRIS' },
     'product.buy.wallet':{ id: 'Sambungkan Wallet', en: 'Connect Wallet' },
@@ -209,7 +210,16 @@ const I18N = (() => {
     'myItems.connect':  { id: 'Sambungkan wallet untuk lihat barang kamu', en: 'Connect wallet to see your items' },
     'myItems.empty':    { id: 'Belum punya barang', en: 'No items yet' },
     'myItems.emptySub': { id: 'Barang yang kamu beli akan muncul di sini', en: 'Items you buy will appear here' },
-    'myItems.transfer': { id: 'Kirim', en: 'Transfer' },
+    'myItems.transfer':   { id: 'Transfer',     en: 'Transfer' },
+    'myItems.share':      { id: 'Bagikan',      en: 'Share' },
+    'myItems.receipt.item':   { id: 'Barang',   en: 'Item' },
+    'myItems.receipt.id':     { id: 'ID Token', en: 'Token ID' },
+    'myItems.receipt.price':  { id: 'Harga',    en: 'Price' },
+    'myItems.receipt.owner':  { id: 'Pemilik',  en: 'Owner' },
+    'myItems.receipt.title':  { id: 'Bukti Kepemilikan', en: 'Ownership Receipt' },
+    'myItems.receipt.share':  { id: 'Bagikan',  en: 'Share' },
+    'myItems.receipt.dl':     { id: 'Simpan',   en: 'Save' },
+    'myItems.receipt.copied': { id: 'Tautan disalin!', en: 'Link copied!' },
   };
 
   let current = localStorage.getItem(STORAGE_KEY) || 'en';
