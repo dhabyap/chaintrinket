@@ -1,0 +1,231 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>ChainTrinket — Pitch Deck</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:#020617;color:#f6f1e4;font-family:'Space Grotesk',sans-serif;overflow:hidden;}
+  .deck{width:100vw;height:100vh;position:relative;overflow:hidden;}
+  .slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:60px;opacity:0;transition:opacity .4s;pointer-events:none;}
+  .slide.active{opacity:1;pointer-events:auto;z-index:2;}
+  .slide-inner{max-width:960px;width:100%;}
+  h1{font-family:'Fraunces',serif;font-weight:700;font-size:56px;margin-bottom:12px;line-height:1.1;}
+  h1 .gold{color:#c9a227;}
+  h1 .jade{color:#2f6e4b;}
+  .sub{font-size:18px;color:rgba(246,241,228,0.55);font-family:'JetBrains Mono',monospace;margin-bottom:30px;line-height:1.6;}
+  h2{font-family:'Fraunces',serif;font-weight:600;font-size:38px;margin-bottom:16px;}
+  h2 .gold{color:#c9a227;}
+  h2 .jade{color:#2f6e4b;}
+  .body-text{font-size:16px;line-height:1.7;color:rgba(246,241,228,0.8);margin-bottom:14px;max-width:700px;}
+  ul{list-style:none;padding:0;display:flex;flex-direction:column;gap:10px;}
+  ul li{font-size:16px;line-height:1.5;color:rgba(246,241,228,0.8);padding-left:24px;position:relative;}
+  ul li::before{content:'◆';position:absolute;left:0;color:#c9a227;font-size:10px;top:5px;}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:20px;}
+  .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-top:20px;}
+  .card{background:rgba(15,23,42,0.6);border:1px solid rgba(246,241,228,0.08);border-radius:12px;padding:22px;}
+  .card h3{font-family:'Fraunces',serif;font-size:18px;color:#c9a227;margin-bottom:8px;}
+  .card p{font-size:13px;color:rgba(246,241,228,0.55);line-height:1.5;}
+  .nav{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:10;display:flex;gap:8px;align-items:center;background:rgba(15,23,42,0.8);backdrop-filter:blur(8px);padding:8px 16px;border-radius:20px;border:1px solid rgba(246,241,228,0.08);}
+  .nav button{background:rgba(201,162,39,0.15);border:1px solid rgba(201,162,39,0.3);color:#c9a227;padding:6px 14px;border-radius:6px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:12px;transition:all .15s;}
+  .nav button:hover{background:rgba(201,162,39,0.3);}
+  .nav .dots{display:flex;gap:5px;margin:0 8px;}
+  .nav .dot{width:8px;height:8px;border-radius:50%;background:rgba(246,241,228,0.2);cursor:pointer;transition:all .15s;}
+  .nav .dot.active{background:#c9a227;transform:scale(1.3);}
+  .nav .num{font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(246,241,228,0.35);margin-right:6px;}
+  .tag{display:inline-flex;align-items:center;gap:6px;background:rgba(201,162,39,0.1);border:1px solid rgba(201,162,39,0.25);padding:6px 14px;border-radius:20px;font-size:12px;font-family:'JetBrains Mono',monospace;color:#c9a227;margin-bottom:20px;}
+  .tag .live{width:6px;height:6px;border-radius:50%;background:#22c55e;animation:pulse 2s infinite;}
+  @keyframes pulse{0%{opacity:1}50%{opacity:0.3}100%{opacity:1}}
+  .brand{display:flex;align-items:center;gap:10px;margin-bottom:24px;}
+  .brand .ct{width:40px;height:40px;border-radius:50%;border:2.5px solid #c9a227;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:600;font-size:15px;color:#c9a227;}
+  .brand .name{font-family:'Fraunces',serif;font-weight:600;font-size:22px;}
+  .arch-svg{margin-top:14px;border-radius:12px;overflow:hidden;background:#0f172a;padding:20px;border:1px solid rgba(246,241,228,0.06);}
+  .badge-row{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0;}
+  .badge{background:rgba(47,110,75,0.15);border:1px solid rgba(47,110,75,0.3);color:#2f6e4b;padding:4px 12px;border-radius:14px;font-size:11px;font-family:'JetBrains Mono',monospace;}
+  .arch{display:flex;flex-direction:column;gap:14px;}
+  .arch-layer{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;border:1px solid rgba(246,241,228,0.06);}
+  .arch-layer .label{font-size:11px;font-family:'JetBrains Mono',monospace;color:rgba(246,241,228,0.4);width:80px;flex-shrink:0;}
+  .arch-layer .items{display:flex;gap:8px;flex-wrap:wrap;}
+  .arch-layer .items span{padding:5px 12px;border-radius:6px;font-size:12px;}
+  .arch-layer .items .fe{background:rgba(8,51,68,0.4);border:1px solid #22d3ee;color:#22d3ee;}
+  .arch-layer .items .be{background:rgba(6,78,59,0.4);border:1px solid #34d399;color:#34d399;}
+  .arch-layer .items .db{background:rgba(76,29,149,0.4);border:1px solid #a78bfa;color:#a78bfa;}
+  .arch-layer .items .ex{background:rgba(120,53,15,0.3);border:1px solid #fbbf24;color:#fbbf24;}
+  .screenshot-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0;}
+  .screenshot-grid .img{background:rgba(15,23,42,0.5);border-radius:6px;border:1px solid rgba(246,241,228,0.06);padding:20px;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:24px;color:rgba(201,162,39,0.3);height:100px;position:relative;overflow:hidden;}
+  .screenshot-grid .img .lbl{position:absolute;bottom:8px;font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(246,241,228,0.25);}
+  .flow{display:flex;align-items:center;gap:16px;margin:20px 0;flex-wrap:wrap;justify-content:center;}
+  .flow .step{text-align:center;min-width:120px;}
+  .flow .step .icon{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:20px;}
+  .flow .step .step-label{font-size:11px;color:rgba(246,241,228,0.5);font-family:'JetBrains Mono',monospace;}
+  .flow .arrow{font-size:20px;color:rgba(201,162,39,0.4);}
+  .icon-qr{background:rgba(8,51,68,0.3);border:1px solid #22d3ee;}
+  .icon-wallet{background:rgba(6,78,59,0.3);border:1px solid #34d399;}
+  .icon-check{background:rgba(76,29,149,0.3);border:1px solid #a78bfa;}
+  .icon-share{background:rgba(120,53,15,0.3);border:1px solid #fbbf24;}
+  .cta{display:inline-flex;align-items:center;gap:6px;background:#c9a227;color:#0e0f0c;padding:12px 28px;border-radius:8px;font-weight:600;font-size:15px;margin-top:20px;cursor:pointer;transition:transform .12s;}
+  .cta:active{transform:translateY(1px);}
+  @media(max-width:768px){
+    h1{font-size:32px;}h2{font-size:26px;}
+    .slide{padding:30px 20px;}
+    .grid-2,.grid-3{grid-template-columns:1fr;}
+    .flow{flex-direction:column;}
+    .screenshot-grid{grid-template-columns:1fr;}
+  }
+</style></head>
+<body>
+<div class="deck" id="deck">
+
+<!-- SLIDE 1: Cover -->
+<div class="slide active" data-index="0">
+  <div class="slide-inner" style="text-align:center;">
+    <div class="brand" style="justify-content:center;">
+      <div class="ct">CT</div>
+      <div class="name">ChainTrinket</div>
+    </div>
+    <div class="badge-row" style="justify-content:center;">
+      <span class="badge">⚡ Stellar Soroban</span>
+      <span class="badge">🌐 GitHub Pages</span>
+      <span class="badge">🏪 Hackathon 2026</span>
+    </div>
+    <h1>Physical <span class="gold">accessories</span>,<br><span class="jade">ownership proof</span> on-chain</h1>
+    <p class="sub" style="max-width:600px;margin:0 auto;">Bracelets · Necklaces · Rings — each item linked to a Stellar token. Scan. See owner. Take home.</p>
+    <div style="margin-top:40px;">
+      <a class="cta" href="https://dhabyap.github.io/chaintrinket/" target="_blank">→ View Live Demo</a>
+    </div>
+    <p style="margin-top:30px;font-size:12px;font-family:'JetBrains Mono',monospace;color:rgba(246,241,228,0.25);">← Use arrow keys to navigate</p>
+  </div>
+</div>
+
+<!-- SLIDE 2: Problem -->
+<div class="slide" data-index="1">
+  <div class="slide-inner">
+    <div class="tag"><span class="live"></span> Problem</div>
+    <h2>Trust in second-hand <span class="gold">is broken</span></h2>
+    <div class="grid-2">
+      <div class="card"><h3>❓ No Proof</h3><p>"I bought this at an event. How do I prove it's mine when I walk out?"</p></div>
+      <div class="card"><h3>📄 Paper Fades</h3><p>Receipts get lost, ink fades, QR stickers peel off. No permanent ownership record.</p></div>
+      <div class="card"><h3>🤝 Trust Barrier</h3><p>Buyers hesitate at booths — "Is this really authentic? Who owned it before?"</p></div>
+      <div class="card"><h3>🧩 Crypto Gap</h3><p>Existing NFT solutions require wallets, gas fees, and tech knowledge. Event-goers just want the bracelet.</p></div>
+    </div>
+    <p class="body-text" style="margin-top:18px;"><b>The result:</b> fewer sales at events, lower perceived value, and no secondary market for physical accessories.</p>
+  </div>
+</div>
+
+<!-- SLIDE 3: Solution -->
+<div class="slide" data-index="2">
+  <div class="slide-inner">
+    <div class="tag"><span class="live"></span> Solution</div>
+    <h2>One <span class="gold">scan</span>, one <span class="jade">token</span></h2>
+    <div class="grid-3">
+      <div class="card" style="text-align:center;padding:30px 16px;"><div style="font-size:38px;margin-bottom:8px;">🏷️</div><h3 style="font-size:18px;">Physical Tag</h3><p>Each item has a unique QR tag. Scan with any phone camera — no app install.</p></div>
+      <div class="card" style="text-align:center;padding:30px 16px;"><div style="font-size:38px;margin-bottom:8px;">🔗</div><h3 style="font-size:18px;">On-Chain Token</h3><p>Stellar Soroban contract links every bracelet/ring to one NFT. Owner = owner of the physical item.</p></div>
+      <div class="card" style="text-align:center;padding:30px 16px;"><div style="font-size:38px;margin-bottom:8px;">📱</div><h3 style="font-size:18px;">Shareable Receipt</h3><p>Proof of ownership with QR code. Share to X, IG, or WhatsApp — instantly verifiable.</p></div>
+    </div>
+    <div class="badge-row" style="justify-content:center;margin-top:8px;">
+      <span class="badge">✅ No crypto knowledge needed</span>
+      <span class="badge">✅ Works offline</span>
+      <span class="badge">✅ 3-second finality</span>
+      <span class="badge">✅ &lt;$0.001 per tx</span>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 4: How It Works -->
+<div class="slide" data-index="3">
+  <div class="slide-inner">
+    <div class="tag"><span class="live"></span> Flow</div>
+    <h2>From <span class="gold">booth</span> to <span class="jade">blockchain</span> in 4 steps</h2>
+    <div class="flow">
+      <div class="step"><div class="icon icon-qr">🔍</div><div class="step-label">Scan QR tag</div><div style="font-size:11px;color:rgba(246,241,228,0.3);">Any phone camera</div></div>
+      <div class="arrow">→</div>
+      <div class="step"><div class="icon icon-wallet">💳</div><div class="step-label">Pay (QRIS/Wallet)</div><div style="font-size:11px;color:rgba(246,241,228,0.3);">QRIS or Stellar XLM</div></div>
+      <div class="arrow">→</div>
+      <div class="step"><div class="icon icon-check">✅</div><div class="step-label">Token transfer</div><div style="font-size:11px;color:rgba(246,241,228,0.3);">Admin marks sold</div></div>
+      <div class="arrow">→</div>
+      <div class="step"><div class="icon icon-share">📤</div><div class="step-label">Share receipt</div><div style="font-size:11px;color:rgba(246,241,228,0.3);">Proof on Stellar</div></div>
+    </div>
+    <div class="arch-svg">
+      <div class="arch">
+        <div class="arch-layer"><span class="label">Frontend</span><div class="items"><span class="fe">HTML/CSS/JS</span><span class="fe">React 18 CDN</span><span class="fe">i18n EN/ID</span></div></div>
+        <div class="arch-layer"><span class="label">SDK Layer</span><div class="items"><span class="be">Stellar SDK v16</span><span class="be">Freighter API</span></div></div>
+        <div class="arch-layer"><span class="label">Blockchain</span><div class="items"><span class="db">Soroban Contract</span><span class="db">Horizon Tx</span></div></div>
+        <div class="arch-layer"><span class="label">Infra</span><div class="items"><span class="ex">GitHub Pages CDN</span><span class="ex">Service Worker</span></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 5: Demo Screens -->
+<div class="slide" data-index="4">
+  <div class="slide-inner">
+    <div class="tag"><span class="live"></span> Product</div>
+    <h2><span class="gold">5 pages</span>, one experience</h2>
+    <div class="screenshot-grid">
+      <div class="img">🏠<div class="lbl">Home — Tag preview + "How to buy"</div></div>
+      <div class="img">📋<div class="lbl">Catalog — 5 demo products + filter/search</div></div>
+      <div class="img">🔖<div class="lbl">Product — Art, social proof, owner, buy buttons</div></div>
+      <div class="img">👤<div class="lbl">My Items — Receipt + transfer + share</div></div>
+    </div>
+    <div class="badge-row" style="justify-content:center;">
+      <span class="badge">🚀 Hamburger mobile nav</span>
+      <span class="badge">📊 Admin analytics</span>
+      <span class="badge">🔌 Offline SW cache</span>
+      <span class="badge">🌍 2 languages</span>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 6: Tech + Q&A -->
+<div class="slide" data-index="5">
+  <div class="slide-inner">
+    <div class="tag"><span class="live"></span> Tech</div>
+    <h2>Built for <span class="gold">hackathons</span></h2>
+    <div class="grid-2">
+      <div class="card"><h3>⚡ Stellar Soroban</h3><p>3-5s finality, &lt;0.001 XLM/tx. Smart contracts in Rust. Perfect for high-volume, low-value asset tracking.</p></div>
+      <div class="card"><h3>🌐 No Build Step</h3><p>Pure HTML/CSS/JS + CDN. Open in any browser — no npm, no bundler, no CI. Deploy to GitHub Pages in 2 clicks.</p></div>
+      <div class="card"><h3>📱 Offline-First</h3><p>Service Worker caches all pages. At event booths with bad signal? Still loads instantly.</p></div>
+      <div class="card"><h3>🌍 Bilingual</h3><p>ID/EN with localStorage persistence. Custom i18n via data-i18n attributes + custom events for React re-render.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 7: Impact + CTA -->
+<div class="slide" data-index="6">
+  <div class="slide-inner" style="text-align:center;">
+    <div class="tag" style="justify-content:center;"><span class="live"></span> Impact</div>
+    <h1><span class="gold">Proven</span> at events</h1>
+    <div class="grid-3" style="margin-top:16px;">
+      <div class="card" style="text-align:center;padding:24px 12px;"><div style="font-family:'Fraunces',serif;font-size:48px;font-weight:700;color:#c9a227;">3s</div><p style="font-size:12px;">Stellar finality — faster than credit card approval</p></div>
+      <div class="card" style="text-align:center;padding:24px 12px;"><div style="font-family:'Fraunces',serif;font-size:48px;font-weight:700;color:#c9a227;">0</div><p style="font-size:12px;">Crypto knowledge needed. Works with WhatsApp + QRIS.</p></div>
+      <div class="card" style="text-align:center;padding:24px 12px;"><div style="font-family:'Fraunces',serif;font-size:48px;font-weight:700;color:#c9a227;">$0</div><p style="font-size:12px;">Hosting cost. GitHub Pages + Testnet = free to run.</p></div>
+    </div>
+    <div style="margin-top:30px;">
+      <a class="cta" href="https://github.com/dhabyap/chaintrinket" target="_blank">← View on GitHub</a>
+      <a class="cta" href="https://dhabyap.github.io/chaintrinket/" target="_blank" style="margin-left:12px;background:transparent;border:2px solid #c9a227;color:#c9a227;">Try the Demo →</a>
+    </div>
+    <p style="margin-top:20px;font-size:12px;font-family:'JetBrains Mono',monospace;color:rgba(246,241,228,0.2);">Built by dhabyap · ChainTrinket 2026</p>
+  </div>
+</div>
+
+</div>
+
+<!-- Navigation -->
+<div class="nav">
+  <button onclick="prev()">←</button>
+  <span class="num"><span id="slideNum">1</span>/7</span>
+  <div class="dots" id="dots"></div>
+  <button onclick="next()">→</button>
+</div>
+
+<script>
+  var slides = document.querySelectorAll('.slide');
+  var current = 0;
+  var dots = document.getElementById('dots');
+  slides.forEach(function(s,i){ var d=document.createElement('div');d.className='dot'+(i===0?' active':'');d.onclick=function(){go(i);};dots.appendChild(d); });
+  function go(i){slides[current].classList.remove('active');dots.children[current].classList.remove('active');current=i;slides[current].classList.add('active');dots.children[current].classList.add('active');document.getElementById('slideNum').textContent=i+1;}
+  function next(){if(current<slides.length-1)go(current+1);}
+  function prev(){if(current>0)go(current-1);}
+  document.addEventListener('keydown',function(e){if(e.key==='ArrowRight')next();if(e.key==='ArrowLeft')prev();});
+  // Touch swipe
+  var sx=0;document.addEventListener('touchstart',function(e){sx=e.touches[0].clientX;});
+  document.addEventListener('touchend',function(e){var dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>50){if(dx<0)next();else prev();}});
+</script>
+</body></html>
