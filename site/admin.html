@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ChainTrinket — Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="./js/i18n.js"></script>
 <style>
   :root{
     --bg:#0e0f0c; --bg-2:#15160f; --bg-3:#1c1e14;
@@ -28,7 +29,19 @@
   button{ font-family:inherit; cursor:pointer; border:none; }
   :focus-visible{ outline:2px solid var(--gold-light); outline-offset:2px; }
 
-  /* ===== topbar ===== */
+  /* Skeleton shimmer */
+  .skeleton{
+    background-color: var(--bg-3);
+    background-image: linear-gradient(90deg, var(--bg-3) 0px, #26291d 40px, var(--bg-3) 80px);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.5s infinite linear;
+    display:block;
+  }
+  @keyframes skeleton-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
   .topbar{
     position:sticky; top:0; z-index:20;
     background:rgba(14,15,12,0.9); backdrop-filter:blur(8px);
@@ -44,6 +57,12 @@
   }
   .brand-sub{ font-family:var(--font-mono); font-size:11px; color:rgba(246,241,228,0.45); margin-left:10px; }
   .topbar-right{ display:flex; align-items:center; gap:12px; }
+  .lang-toggle{
+    font-family:var(--font-mono); font-size:11px; letter-spacing:0.04em;
+    background:transparent; border:1px solid rgba(246,241,228,0.25); color:rgba(246,241,228,0.55);
+    padding:4px 10px; border-radius:12px; cursor:pointer;
+  }
+  .lang-toggle:hover{ border-color:var(--gold-light); color:var(--gold-light); }
   .net-badge{
     font-family:var(--font-mono); font-size:10.5px; color:var(--jade-light);
     background:rgba(47,110,75,0.16); border:1px solid rgba(47,110,75,0.45);
@@ -65,7 +84,6 @@
   .btn-outline{ background:transparent; border:1.5px solid rgba(246,241,228,0.3); color:var(--paper); }
   .btn-outline:hover{ border-color:var(--gold-light); color:var(--gold-light); }
 
-  /* ===== stat row ===== */
   .stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:26px; }
   .stat-box{
     background:var(--bg-3); border:1px solid var(--line); border-radius:10px; padding:16px 18px;
@@ -76,7 +94,6 @@
   .stat-box.jade b{ color:var(--jade-light); }
   .stat-box.rust b{ color:#e58a76; }
 
-  /* ===== ledger (paper table) ===== */
   .ledger{
     background:var(--paper); color:var(--ink); border-radius:10px; overflow:hidden;
     box-shadow:0 24px 50px -24px rgba(0,0,0,0.55);
@@ -126,7 +143,6 @@
     border-top:1px dashed rgba(27,27,22,0.2);
   }
 
-  /* ===== modal shell ===== */
   .overlay{
     position:fixed; inset:0; background:rgba(9,10,7,0.72); z-index:50;
     display:flex; align-items:center; justify-content:center; padding:20px;
@@ -164,7 +180,6 @@
   .modal-btn.primary{ background:var(--ink); color:var(--paper); }
   .modal-btn.ghost{ background:transparent; border:1.5px solid var(--ink); color:var(--ink); margin-top:8px; }
 
-  /* ===== QR modal ===== */
   .qr-tag{
     width:180px; margin:6px auto 16px; background:var(--paper); border:2px solid var(--ink);
     border-radius:4px; padding:16px 14px; text-align:center; position:relative;
@@ -187,6 +202,12 @@
   }
   .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
 
+  .err-box{
+    background:var(--rust-light); color:var(--rust); border-radius:6px;
+    padding:11px 13px; font-size:12.5px; margin:10px 0 14px; line-height:1.5;
+    display:flex; gap:9px; align-items:flex-start;
+  }
+
   @media (max-width:720px){
     .stats{ grid-template-columns:1fr 1fr; }
     thead th:nth-child(4), tbody td:nth-child(4){ display:none; }
@@ -205,6 +226,7 @@
 <div class="topbar">
   <a href="home.html" class="brand"><span class="brand-mark">CT</span> ChainTrinket<span class="brand-sub">/ admin</span></a>
   <div class="topbar-right">
+    <button class="lang-toggle" onclick="I18N.toggle()">ID</button>
     <div class="net-badge"><span style="width:6px;height:6px;border-radius:50%;background:#5fd694;display:inline-block;"></span> Testnet</div>
   </div>
 </div>
@@ -212,121 +234,123 @@
 <div class="wrap">
   <div class="page-head">
     <div>
-      <h1>Produk kamu</h1>
-      <p>trinket_token &middot; mint, cetak QR, dan pantau status penjualan</p>
+      <h1 data-i18n="admin.title">Your products</h1>
+      <p data-i18n="admin.sub">trinket_token · mint, print QR, and monitor sales status</p>
     </div>
-    <button class="btn btn-gold" onclick="openModal('mintModal')">+ Produk baru</button>
+    <button class="btn btn-gold" onclick="openModal('mintModal')"><span data-i18n="admin.btnNew">+ New product</span></button>
   </div>
 
   <div class="stats">
-    <div class="stat-box"><b id="statTotal">3</b><span>Total token</span></div>
-    <div class="stat-box jade"><b id="statAvail">2</b><span>Tersedia</span></div>
-    <div class="stat-box rust"><b id="statSold">1</b><span>Terjual</span></div>
-    <div class="stat-box gold"><b id="statRp">Rp 0</b><span>Omzet event</span></div>
+    <div class="stat-box"><b id="statTotal">3</b><span data-i18n="admin.stat.total">Total tokens</span></div>
+    <div class="stat-box jade"><b id="statAvail">2</b><span data-i18n="admin.stat.avail">Available</span></div>
+    <div class="stat-box rust"><b id="statSold">1</b><span data-i18n="admin.stat.sold">Sold</span></div>
+    <div class="stat-box gold"><b id="statRp">Rp 0</b><span data-i18n="admin.stat.omzet">Event revenue</span></div>
   </div>
 
   <div class="ledger">
     <div class="ledger-head">
-      <h3>Daftar token</h3>
-      <input class="ledger-search" placeholder="Cari produk...">
+      <h3 data-i18n="admin.ledger">Token list</h3>
+      <input class="ledger-search" data-i18n="admin.search" placeholder="Search products...">
     </div>
     <table>
       <thead>
-        <tr><th>Produk</th><th>Harga</th><th>Status</th><th>Pemilik</th><th></th></tr>
+        <tr>
+          <th data-i18n="admin.th.product">Product</th>
+          <th data-i18n="admin.th.price">Price</th>
+          <th data-i18n="admin.th.status">Status</th>
+          <th data-i18n="admin.th.owner">Owner</th>
+          <th></th>
+        </tr>
       </thead>
-      <tbody id="ledgerBody">
-        <!-- rows injected by JS -->
-      </tbody>
+      <tbody id="ledgerBody"></tbody>
     </table>
     <div class="ledger-foot">
-      <span>Contract <code>CB3K&hellip;T9Q2</code></span>
-      <span id="ledgerCount">3 produk</span>
+      <span>Contract <code>CB3K…T9Q2</code></span>
+      <span id="ledgerCount">3 products</span>
     </div>
   </div>
 </div>
 
-<!-- ===== Mint Modal ===== -->
+<!-- Mint Modal -->
 <div class="overlay" id="mintModal">
   <div class="modal">
     <div class="modal-head">
-      <h3>Produk baru</h3>
-      <button class="modal-close" onclick="closeModal('mintModal')">&times;</button>
+      <h3 data-i18n="admin.mint.title">New product</h3>
+      <button class="modal-close" onclick="closeModal('mintModal')">×</button>
     </div>
 
     <div class="field">
-      <label>Foto produk</label>
+      <label data-i18n="admin.mint.photo">Product photo</label>
       <label class="upload-box" for="photoInput">
-        <div id="uploadPreview">Klik untuk upload foto &middot; JPG/PNG</div>
+        <div id="uploadPreview" data-i18n="admin.mint.upload">Click to upload photo · JPG/PNG</div>
       </label>
       <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="previewPhoto(event)">
     </div>
 
     <div class="field">
-      <label>Nama produk</label>
-      <input type="text" id="mintName" placeholder="cth. Gelang Manik Hijau">
+      <label data-i18n="admin.mint.name">Product name</label>
+      <input type="text" id="mintName" placeholder="e.g. Green Bead Bracelet">
     </div>
 
     <div class="field">
-      <label>Harga (XLM)</label>
+      <label data-i18n="admin.mint.price">Price (XLM)</label>
       <input type="number" id="mintPriceXlm" placeholder="0.5" step="0.1" style="max-width:200px;">
     </div>
 
-    <button class="modal-btn primary" onclick="mintProduct()">Mint &amp; generate QR</button>
-    <button class="modal-btn ghost" onclick="closeModal('mintModal')">Batal</button>
+    <button class="modal-btn primary" onclick="mintProduct()" data-i18n="admin.mint.go">Mint & generate QR</button>
+    <button class="modal-btn ghost" onclick="closeModal('mintModal')" data-i18n="btn.cancel">Cancel</button>
   </div>
 </div>
 
-<!-- ===== QR Modal ===== -->
+<!-- QR Modal -->
 <div class="overlay" id="qrModal">
   <div class="modal" style="text-align:center;">
     <div class="modal-head">
-      <h3>QR siap cetak</h3>
-      <button class="modal-close" onclick="closeModal('qrModal')">&times;</button>
+      <h3 data-i18n="admin.qr.title">QR ready to print</h3>
+      <button class="modal-close" onclick="closeModal('qrModal')">×</button>
     </div>
 
     <div class="qr-tag" id="qrTagPreview">
-      <div class="qt-mark">&#9733; ChainTrinket</div>
-      <div class="qt-img" id="qrCanvas">
-        <!-- QR generated by QRCode library -->
-      </div>
-      <div class="qt-name" id="qrTagName">Gelang Manik Hijau</div>
+      <div class="qt-mark">★ ChainTrinket</div>
+      <div class="qt-img" id="qrCanvas"></div>
+      <div class="qt-name" id="qrTagName">Green Bead Bracelet</div>
       <div class="qt-idx" id="qrTagIdx">Token #4 / 10</div>
     </div>
 
-    <button class="modal-btn primary" onclick="printTag()">Cetak (4&times;4 cm)</button>
-    <button class="modal-btn ghost" onclick="closeModal('qrModal')">Tutup</button>
+    <button class="modal-btn primary" onclick="printTag()" data-i18n="admin.qr.print">Print (4×4 cm)</button>
+    <button class="modal-btn ghost" onclick="closeModal('qrModal')" data-i18n="btn.close">Close</button>
   </div>
 </div>
 
-<!-- ===== Sell Modal ===== -->
+<!-- Sell Modal -->
 <div class="overlay" id="sellModal">
   <div class="modal">
     <div class="modal-head">
-      <h3>Transfer token ke buyer</h3>
-      <button class="modal-close" onclick="closeSell()">&times;</button>
+      <h3 data-i18n="admin.sell.title">Transfer token to buyer</h3>
+      <button class="modal-close" onclick="closeSell()">×</button>
     </div>
 
-    <p style="font-size:13px;color:var(--ink-soft);margin:0 0 6px;line-height:1.5;">
-      Masukkan alamat wallet Stellar pembeli.<br>
-      Token akan dikirim dan otomatis ditandai <strong>Terjual</strong>.
+    <p style="font-size:13px;color:var(--ink-soft);margin:0 0 6px;line-height:1.5;" data-i18n-html="admin.sell.desc">
+      Enter buyer's Stellar wallet address.<br>
+      Token will be sent and automatically marked as <strong>Sold</strong>.
     </p>
 
     <div class="field">
-      <label>Token ID</label>
+      <label data-i18n="admin.sell.tokenId">Token ID</label>
       <input type="text" id="sellTokenId" readonly style="background:var(--paper-3);">
     </div>
     <div class="field">
-      <label>Alamat wallet buyer</label>
-      <input type="text" id="sellBuyerAddr" placeholder="G... atau C...">
+      <label data-i18n="admin.sell.buyerAddr">Buyer wallet address</label>
+      <input type="text" id="sellBuyerAddr" placeholder="G... or C...">
     </div>
     <div id="sellStatus" style="display:none;"></div>
 
-    <button class="modal-btn primary" id="sellBtn" onclick="confirmSell()">Transfer token</button>
-    <button class="modal-btn ghost" onclick="closeSell()">Batal</button>
+    <button class="modal-btn primary" id="sellBtn" onclick="confirmSell()" data-i18n="admin.sell.go">Transfer token</button>
+    <button class="modal-btn ghost" onclick="closeSell()" data-i18n="btn.cancel">Cancel</button>
   </div>
 </div>
 
-<div class="toast" id="toast">Token berhasil di-mint</div>
+<div class="toast" id="toast">Token minted successfully</div>
 
 <script src="https://unpkg.com/@stellar/stellar-sdk@16.0.1/dist/stellar-sdk.min.js?v=2"></script>
 <script src="https://cdn.jsdelivr.net/npm/@stellar/freighter-api@6.0.1/build/index.min.js"></script>
@@ -336,12 +360,25 @@
   const admin = CT.CONFIG.admin;
   const swatches = ['#c9a227','#2f6e4b','#a13d2b','#5b5748'];
 
+  // Pre-fill skeleton
+  document.querySelectorAll('.stat-box b').forEach(b => { b.textContent = '—'; });
+
   function previewPhoto(e){
     var el=document.getElementById('uploadPreview');
-    if(e.target.files&&e.target.files[0])el.innerHTML='<span style="color:var(--jade);">\u2713 '+e.target.files[0].name+'</span>';
+    if(e.target.files&&e.target.files[0]) el.innerHTML='<span style="color:var(--jade);">✓ '+e.target.files[0].name+'</span>';
   }
 
+  function openModal(id){ document.getElementById(id).classList.add('show'); }
+  function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+
   async function loadDashboard() {
+    document.getElementById('ledgerBody').innerHTML = Array(5).fill().map(() => `
+      <tr>
+        <td colspan="5">
+          <div class="skeleton" style="height:48px;border-radius:6px;"></div>
+        </td>
+      </tr>
+    `).join('');
     try {
       let soldCount = 0;
       const rows = [];
@@ -366,50 +403,49 @@
 
   function renderLedger(tokens) {
     const body = document.getElementById('ledgerBody');
-    if (!tokens.length) { body.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#888;">Belum ada token</td></tr>'; return; }
+    if (!tokens.length) { body.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#888;">' + I18N.t('admin.noTokens') + '</td></tr>'; return; }
     body.innerHTML = tokens.map((p, i) => `
       <tr>
         <td>
-          <span class="p-thumb" style="background:${swatches[i % swatches.length]}22; color:${swatches[i % swatches.length]};">&#9670;</span>
+          <span class="p-thumb" style="background:${swatches[i % swatches.length]}22; color:${swatches[i % swatches.length]};">◆</span>
           <span class="p-name">${p.name}</span><br>
-          <span class="p-idx">Token #${p.id} / 10</span>
+          <span class="p-idx">${I18N.t('token.of', {i: p.id, n: tokens.length})}</span>
         </td>
         <td class="price-cell">${CT.formatPrice(p.price)}</td>
-        <td><span class="pill ${p.status}">${p.status === 'available' ? '&#9679; Tersedia' : '&#9679; Terjual'}</span></td>
+        <td><span class="pill ${p.status}">${p.status === 'available' ? '● ' + I18N.t('status.available') : '● ' + I18N.t('status.sold')}</span></td>
         <td class="price-cell">${CT.shortAddr(p.owner)}</td>
         <td>
           <div class="row-actions">
-            ${p.status === 'available' ? `<button class="icon-btn" style="color:var(--jade);font-weight:600;" onclick="openSell(${p.id})">Jual</button>` : ''}
+            ${p.status === 'available' ? `<button class="icon-btn" style="color:var(--jade);font-weight:600;" onclick="openSell(${p.id})">${I18N.t('admin.sell')}</button>` : ''}
             <button class="icon-btn" onclick="showQr(${p.id},'${p.name}')">QR</button>
           </div>
         </td>
       </tr>
     `).join('');
-    document.getElementById('ledgerCount').textContent = tokens.length + ' produk';
+    document.getElementById('ledgerCount').textContent = tokens.length + ' ' + I18N.t('catalog.items');
   }
 
   async function mintProduct() {
     const name = document.getElementById('mintName').value.trim();
-    if (!name) return alert('Nama produk wajib');
+    if (!name) return alert(I18N.t('admin.alert.nameReq'));
     const priceXlm = parseFloat(document.getElementById('mintPriceXlm').value);
-    if (!priceXlm || priceXlm <= 0) return alert('Harga XLM wajib');
+    if (!priceXlm || priceXlm <= 0) return alert(I18N.t('admin.alert.priceReq'));
     const price = Math.round(priceXlm * 10_000_000);
-    const metaUri = 'ipfs://QmPending';
     try {
       const pubKey = await CT.connectFreighter();
-      if (pubKey !== admin) return alert('Hanya admin yang bisa mint');
-      showToast('Mengirim mint tx...');
-      const res = await CT.mint(pubKey, name, metaUri, price);
+      if (pubKey !== admin) return alert(I18N.t('admin.alert.adminOnly'));
+      showToast(I18N.t('admin.sell.preparing'));
+      const res = await CT.mint(pubKey, name, 'ipfs://QmPending', price);
       var newId = 1;
       try { newId = await CT.totalSupply(); } catch(e) {}
-      showToast('Mint berhasil!');
+      showToast(I18N.t('admin.alert.mintSuccess'));
       closeModal('mintModal');
       showQr(newId, name);
       setTimeout(loadDashboard, 3000);
-    } catch(e) { alert('Gagal: ' + e.message); }
+    } catch(e) { alert(I18N.t('admin.alert.mintFail') + e.message); }
   }
 
-  // ─── Sell / Transfer ───
+  // Sell / Transfer
   let sellTokenId = null;
 
   function openSell(tokenId) {
@@ -418,7 +454,7 @@
     document.getElementById('sellBuyerAddr').value = '';
     document.getElementById('sellStatus').style.display = 'none';
     document.getElementById('sellBtn').disabled = false;
-    document.getElementById('sellBtn').textContent = 'Transfer token';
+    document.getElementById('sellBtn').textContent = I18N.t('admin.sell.go');
     document.getElementById('sellBtn').className = 'modal-btn primary';
     openModal('sellModal');
   }
@@ -429,51 +465,48 @@
 
   async function confirmSell() {
     const buyerAddr = document.getElementById('sellBuyerAddr').value.trim();
-    if (!buyerAddr) return alert('Masukkan alamat wallet buyer');
-    if (!buyerAddr.startsWith('G') && !buyerAddr.startsWith('C')) return alert('Alamat tidak valid — harus dimulai dengan G atau C');
-    if (buyerAddr.length < 40) return alert('Alamat tidak valid — terlalu pendek');
+    if (!buyerAddr) return alert(I18N.t('admin.alert.buyerAddrReq'));
+    if (!buyerAddr.startsWith('G') && !buyerAddr.startsWith('C')) return alert(I18N.t('admin.alert.addrInvalid'));
+    if (buyerAddr.length < 40) return alert(I18N.t('admin.alert.addrShort'));
 
     const statusEl = document.getElementById('sellStatus');
     const btn = document.getElementById('sellBtn');
     btn.disabled = true;
-    btn.textContent = 'Memproses...';
+    btn.textContent = I18N.t('admin.sell.processing');
     statusEl.style.display = 'block';
-    statusEl.innerHTML = '<div style="text-align:center;padding:10px;font-size:13px;color:var(--ink-soft);">Menyiapkan transaksi...</div>';
+    statusEl.innerHTML = '<div style="text-align:center;padding:10px;font-size:13px;color:var(--ink-soft);">' + I18N.t('admin.sell.preparing') + '</div>';
 
     try {
       const pubKey = await CT.connectFreighter();
       if (pubKey !== admin) {
-        statusEl.innerHTML = '<div class="err-box"><span>&#9888;&#65039;</span><span>Hanya admin yang bisa transfer. Pastikan wallet admin terhubung.</span></div>';
+        statusEl.innerHTML = '<div class="err-box"><span>⚠</span><span>' + I18N.t('admin.sell.adminOnly') + '</span></div>';
         btn.disabled = false;
-        btn.textContent = 'Coba lagi';
+        btn.textContent = I18N.t('btn.retry');
         return;
       }
 
-      statusEl.innerHTML = '<div style="text-align:center;padding:10px;font-size:13px;color:var(--ink-soft);">Konfirmasi di Freighter...</div>';
+      statusEl.innerHTML = '<div style="text-align:center;padding:10px;font-size:13px;color:var(--ink-soft);">' + I18N.t('admin.sell.confirm') + '</div>';
       const result = await CT.transfer(pubKey, buyerAddr, sellTokenId);
       const hash = result.hash ? result.hash.slice(0,6) + '...' + result.hash.slice(-6) : 'pending';
 
       statusEl.innerHTML = `<div style="background:var(--jade-light);color:var(--jade);border-radius:6px;padding:11px 13px;font-size:12.5px;text-align:center;">
-        &#10003; Token #${sellTokenId} berhasil ditransfer ke buyer!<br>
+        ✓ ${I18N.t('admin.sell.success', {id: sellTokenId})}<br>
         <span style="font-family:var(--font-mono);font-size:11px;display:block;margin-top:4px;">tx: ${hash}</span>
       </div>`;
-      btn.textContent = 'Selesai';
+      btn.textContent = I18N.t('btn.close');
       btn.className = 'modal-btn ghost';
-      showToast('Token #' + sellTokenId + ' berhasil dijual!');
+      showToast(I18N.t('admin.alert.sellSuccess', {id: sellTokenId}));
       closeSell();
       setTimeout(loadDashboard, 3000);
     } catch(e) {
-      statusEl.innerHTML = `<div class="err-box"><span>&#9888;&#65039;</span><span>${e.message || 'Transaksi gagal'}</span></div>`;
+      statusEl.innerHTML = `<div class="err-box"><span>⚠</span><span>${e.message || I18N.t('admin.alert.txFail')}</span></div>`;
       btn.disabled = false;
-      btn.textContent = 'Coba lagi';
+      btn.textContent = I18N.t('btn.retry');
     }
   }
 
-  function openModal(id){ document.getElementById(id).classList.add('show'); }
-  function closeModal(id){ document.getElementById(id).classList.remove('show'); }
-
   function showQr(id, name) {
-    document.getElementById('qrTagName').textContent = name || 'Produk';
+    document.getElementById('qrTagName').textContent = name || 'Product';
     document.getElementById('qrTagIdx').textContent = 'Token #' + id;
     var url = location.origin + '/product.html?id=' + id;
     var cont = document.getElementById('qrCanvas');
@@ -488,52 +521,51 @@
   }
   function printTag() { window.print(); }
 
-  // wire global
   window.openSell = openSell;
   window.closeSell = closeSell;
   window.confirmSell = confirmSell;
 
-  /** Cek apakah contract perlu di-init, tampilkan tombol kalau ya */
+  // Check if contract needs init
   async function checkInit() {
     try {
       const a = await CT._sim('get_admin', []);
-      if (a === CT.CONFIG.admin) return; // already inited
+      if (a === CT.CONFIG.admin) return;
     } catch(e) {
-      console.log('Contract belum di-init, menampilkan tombol init');
+      console.log('Contract not initialized, showing init button');
     }
-    // Show init button
     const wrap = document.querySelector('.wrap');
     const banner = document.createElement('div');
     banner.id = 'initBanner';
     banner.style.cssText = 'background:var(--bg-3);border:1.5px solid var(--gold);border-radius:10px;padding:20px;margin-bottom:20px;text-align:center;';
     banner.innerHTML = `
       <p style="margin:0 0 12px;font-size:14px;color:var(--paper-2);">
-        &#9888; Contract <code style="font-family:var(--font-mono);font-size:12px;">${CT.CONFIG.contractId.slice(0,8)}&hellip;</code>
-        perlu di-init dengan wallet admin kamu.
+        ⚠ Contract <code style="font-family:var(--font-mono);font-size:12px;">${CT.CONFIG.contractId.slice(0,8)}…</code>
+        ${I18N.t('admin.init.desc')}
       </p>
-      <button class="btn btn-gold" onclick="initContractNow()">Init Contract</button>
+      <button class="btn btn-gold" onclick="initContractNow()">${I18N.t('admin.init.btn')}</button>
     `;
     wrap.insertBefore(banner, wrap.firstChild);
   }
   window.initContractNow = async function() {
     try {
       const pk = await CT.connectFreighter();
-      if (pk !== CT.CONFIG.admin) return alert('Wallet ini bukan admin. Connect wallet admin: ' + CT.CONFIG.admin);
+      if (pk !== CT.CONFIG.admin) return alert(I18N.t('admin.alert.adminOnly'));
       const btn = document.querySelector('#initBanner button');
-      btn.textContent = 'Memproses...'; btn.disabled = true;
+      btn.textContent = I18N.t('admin.sell.processing'); btn.disabled = true;
       await CT.initContract(pk);
-      document.getElementById('initBanner').innerHTML = '<p style="margin:0;color:var(--jade-light);font-size:14px;">&#10003; Contract siap! Memuat data...</p>';
+      document.getElementById('initBanner').innerHTML = '<p style="margin:0;color:var(--jade-light);font-size:14px;">✓ ' + I18N.t('admin.init.success') + '</p>';
       setTimeout(() => { const b = document.getElementById('initBanner'); if(b) b.remove(); }, 2000);
       loadDashboard();
     } catch(e) {
-      alert('Gagal init: ' + e.message);
+      alert(I18N.t('admin.init.fail') + e.message);
       const btn = document.querySelector('#initBanner button');
-      if (btn) { btn.textContent = 'Coba lagi'; btn.disabled = false; }
+      if (btn) { btn.textContent = I18N.t('btn.retry'); btn.disabled = false; }
     }
   };
 
   checkInit();
   loadDashboard();
+  I18N.apply();
 </script>
 
 </body>

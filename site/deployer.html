@@ -1,15 +1,23 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ChainTrinket - Deploy Ulang</title>
+<title data-i18n="deployer.title">ChainTrinket - Redeploy</title>
+<script src="./js/i18n.js"></script>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:#0d0f14;color:#e0e4ec;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;display:flex;min-height:100vh;align-items:center;justify-content:center}
   .card{background:#14181e;border-radius:16px;padding:32px;max-width:520px;width:100%;border:1px solid #2a3038}
-  .logo{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+  .card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+  .logo{display:flex;align-items:center;gap:12px}
   .logo-icon{width:40px;height:40px;border-radius:10px;background:#f5c842;color:#0d0f14;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px}
+  .lang-toggle{
+    font-family:monospace; font-size:11px; letter-spacing:0.04em;
+    background:transparent; border:1px solid #4a525e; color:#8a929e;
+    padding:4px 10px; border-radius:12px; cursor:pointer;
+  }
+  .lang-toggle:hover{ border-color:#f5c842; color:#f5c842; }
   h1{font-size:20px;margin-bottom:4px}
   .sub{color:#8a929e;font-size:14px;margin-bottom:24px}
   .info-block{background:#1a1f26;border-radius:12px;padding:16px;margin-bottom:20px;font-size:14px;line-height:1.8}
@@ -32,31 +40,33 @@
 </head>
 <body>
 <div class="card">
-  <div class="logo">
-    <div class="logo-icon">CT</div>
-    <div>
-      <h1>Deploy ulang</h1>
-      <div class="sub">Contract lama pake admin address beda. Deploy baru biar admin = wallet kamu.</div>
+  <div class="card-head">
+    <div class="logo">
+      <div class="logo-icon">CT</div>
+      <div>
+        <h1 data-i18n="deployer.title">Redeploy</h1>
+        <div class="sub" data-i18n="deployer.sub">Old contract uses a different admin address. Deploy a new one so admin = your wallet.</div>
+      </div>
     </div>
+    <button class="lang-toggle" onclick="I18N.toggle()">ID</button>
   </div>
 
   <div class="info-block">
-    <div><span class="label">WASM:</span><span class="val">trinket_token.optimized <span class="highlight">(4.5 KB)</span></span></div>
-    <div><span class="label">Network:</span><span class="val highlight">Testnet</span></div>
+    <div><span class="label">WASM:</span><span class="val"><span data-i18n="deployer.wasm">trinket_token.optimized</span> <span class="highlight">(4.5 KB)</span></span></div>
+    <div><span class="label">Network:</span><span class="val highlight" data-i18n="net.testnet">Testnet</span></div>
     <div><span class="label">RPC:</span><span class="val">https://soroban-testnet.stellar.org</span></div>
   </div>
 
-  <div class="section-label">WALLET ADMIN (FREIGHTER)</div>
-  <div class="wallet-box" id="walletBox">Klik tombol Connect di bawah</div>
+  <div class="section-label" data-i18n="deployer.walletLabel">ADMIN WALLET (FREIGHTER)</div>
+  <div class="wallet-box" id="walletBox" data-i18n="deployer.walletPlaceholder">Click Connect button below</div>
 
-  <button class="btn btn-connect" id="connectBtn" onclick="connectWallet()">1. Connect Freighter</button>
+  <button class="btn btn-connect" id="connectBtn" onclick="connectWallet()" data-i18n="deployer.btn.connect">1. Connect Freighter</button>
   <div id="status"></div>
-  <button class="btn btn-deploy" id="deployBtn" onclick="deployContract()" disabled>2. Deploy contract baru</button>
+  <button class="btn btn-deploy" id="deployBtn" onclick="deployContract()" disabled data-i18n="deployer.btn.deploy">2. Deploy new contract</button>
   <div id="result"></div>
 </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@stellar/stellar-sdk@16.0.1/dist/stellar-sdk.min.js"></script>
-  <script>console.log('SDK loaded, Address.toScVal:', typeof StellarSdk.Address.prototype.toScVal);</script>
 <script src="https://cdn.jsdelivr.net/npm/@stellar/freighter-api@6.0.1/build/index.min.js"></script>
 <script>
 window.SS = StellarSdk;
@@ -74,21 +84,25 @@ window.SS = StellarSdk;
     return bytes;
   }
 
+  function setStatus(el, type, msg) {
+    el.className = type;
+    el.textContent = msg;
+  }
+
   async function connectWallet() {
     const st = document.getElementById('status');
     try {
-      if (!window.freighterApi) throw new Error('Freighter tidak terinstall');
+      if (!window.freighterApi) throw new Error(I18N.t('deployer.error.nofreighter'));
       const result = await window.freighterApi.requestAccess();
       adminAddr = result.address || result;
       document.getElementById('walletBox').textContent = adminAddr;
-      document.getElementById('connectBtn').textContent = '✓ Freighter tersambung';
+      document.getElementById('connectBtn').innerHTML = '\u2713 ' + I18N.t('deployer.btn.connectOk');
       document.getElementById('connectBtn').className = 'btn btn-connect ok';
       document.getElementById('deployBtn').disabled = false;
-      st.innerHTML = '';
       st.className = '';
+      st.innerHTML = '';
     } catch(e) {
-      st.className = 'error';
-      st.innerHTML = '✗ Gagal: ' + e.message;
+      setStatus(st, 'error', '\u2717 ' + I18N.t('deployer.error.generic') + e.message);
     }
   }
 
@@ -97,31 +111,27 @@ window.SS = StellarSdk;
     const deployBtn = document.getElementById('deployBtn');
     const resultDiv = document.getElementById('result');
     deployBtn.disabled = true;
-    deployBtn.textContent = 'Memproses...';
+    deployBtn.textContent = I18N.t('deployer.btn.processing');
 
     try {
-      st.textContent = '\u23F3 Cek sequence account...';
-      st.className = 'pending';
+      setStatus(st, 'pending', '\u23F3 ' + I18N.t('deployer.status.checkSeq'));
 
-      // Small delay to let Horizon index the new account
       await new Promise(r => setTimeout(r, 2000));
-      // Ambil sequence dari Horizon (account klasik)
       const horizResp = await fetch(HORIZON + '/accounts/' + adminAddr);
       if (!horizResp.ok) {
-        // Retry once after short wait
         await new Promise(r => setTimeout(r, 2000));
         const retryResp = await fetch(HORIZON + '/accounts/' + adminAddr);
-        if (!retryResp.ok) throw new Error('Account tidak ditemukan di testnet. Isi dulu via friendbot.');
+        if (!retryResp.ok) throw new Error(I18N.t('deployer.error.noAccount'));
         const horizData = await retryResp.json();
         const seq = horizData.sequence;
-        const acc = new SS.Account(adminAddr, seq);
+        var acc = new SS.Account(adminAddr, seq);
       } else {
         const horizData = await horizResp.json();
         const seq = horizData.sequence;
-        const acc = new SS.Account(adminAddr, seq);
+        acc = new SS.Account(adminAddr, seq);
       }
 
-      st.textContent = '\u23F3 Bikin transaksi deploy...';
+      setStatus(st, 'pending', '\u23F3 ' + I18N.t('deployer.status.building'));
 
       const wasmId = hexToBytes(WASM_HASH);
       const salt = crypto.getRandomValues(new Uint8Array(32));
@@ -141,27 +151,26 @@ window.SS = StellarSdk;
         networkPassphrase: NET
       }).addOperation(deployOp).setTimeout(60).build();
 
-      st.textContent = '\u23F3 Simulasi transaksi...';
+      setStatus(st, 'pending', '\u23F3 ' + I18N.t('deployer.status.simulating'));
       const prep = await server.prepareTransaction(tx);
 
-      st.textContent = '\u23F3 Konfirmasi di Freighter...';
+      setStatus(st, 'pending', '\u23F3 ' + I18N.t('deployer.status.confirming'));
       const { signedTxXdr } = await window.freighterApi.signTransaction(prep.toXDR(), {
         networkPassphrase: NET,
         address: adminAddr
       });
 
-      st.textContent = '\u23F3 Submit ke network...';
+      setStatus(st, 'pending', '\u23F3 ' + I18N.t('deployer.status.submitting'));
       const sendRes = await server.sendTransaction(SS.TransactionBuilder.fromXDR(signedTxXdr, NET));
 
       if (sendRes.status === 'PENDING') {
-        st.textContent = '\u23F3 Nunggu konfirmasi...';
+        setStatus(st, 'pending', '\u23F3 ' + I18N.t('deployer.status.waiting'));
         for (let i = 0; i < 60; i++) {
           await new Promise(r => setTimeout(r, 2000));
           const getRes = await server.getTransaction(sendRes.hash);
           if (getRes.status === 'SUCCESS') {
-            st.className = 'success';
-            st.innerHTML = '\u2713 Contract deployed!';
-            deployBtn.textContent = 'Berhasil!';
+            setStatus(st, 'success', '\u2713 ' + I18N.t('deployer.success.title'));
+            deployBtn.textContent = I18N.t('deployer.success.done');
             deployBtn.disabled = true;
 
             let contractId = null;
@@ -194,31 +203,28 @@ window.SS = StellarSdk;
             }
             resultDiv.innerHTML = `
               <div class="success" style="margin-top:12px">
-                <strong>Contract ID:</strong><br>
+                <strong>${I18N.t('deployer.success.id')}</strong><br>
                 <code style="font-size:13px;word-break:break-all">${contractId}</code>
               </div>
-              <p style="color:#8a929e;font-size:14px;margin-top:8px">
-                Contract sudah deploy + init dengan admin wallet kamu.<br>
-                Buka <strong>admin.html</strong> untuk mulai mint produk.
-              </p>
+              <p style="color:#8a929e;font-size:14px;margin-top:8px">${I18N.t('deployer.success.note')}</p>
             `;
             return;
           }
-          if (getRes.status === 'FAILED') throw new Error('Transaksi gagal. Cek kontrak.');
+          if (getRes.status === 'FAILED') throw new Error(I18N.t('deployer.error.txFailed'));
         }
-        throw new Error('Timeout nunggu konfirmasi.');
+        throw new Error(I18N.t('deployer.error.timeout'));
       } else {
         throw new Error('Status: ' + sendRes.status);
       }
     } catch(e) {
-      st.className = 'error';
-      st.innerHTML = '&#10007; Gagal: ' + e.message;
+      setStatus(st, 'error', '\u2717 ' + I18N.t('deployer.error.generic') + e.message);
       deployBtn.disabled = false;
-      deployBtn.textContent = 'Coba lagi';
+      deployBtn.textContent = I18N.t('deployer.btn.tryAgain');
     }
   }
   window.connectWallet = connectWallet;
   window.deployContract = deployContract;
+  I18N.apply();
 </script>
 </body>
 </html>

@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>ChainTrinket — Fashion on-chain</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="home.title">ChainTrinket — Fashion on-chain</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="./js/i18n.js"></script>
 <style>
   :root{
     --bg:#0e0f0c;
@@ -33,6 +34,32 @@
     font-family:var(--font-body); -webkit-font-smoothing:antialiased;
     overflow-x:hidden;
   }
+  /* ===== loading ===== */
+  #loader{
+    position:fixed; inset:0; z-index:100;
+    background:var(--bg); display:flex; align-items:center; justify-content:center;
+    transition:opacity 0.5s ease;
+  }
+  .spinner{
+    width:40px; height:40px; border:3px solid var(--bg-3);
+    border-top:3px solid var(--gold); border-radius:50%;
+    animation:spin 1s linear infinite;
+  }
+  @keyframes spin{ 0%{ transform:rotate(0deg); } 100%{ transform:rotate(360deg); } }
+
+  /* ===== reveal animation ===== */
+  .reveal{
+    opacity:0; transform:translateY(30px);
+    transition:opacity 0.6s ease-out, transform 0.6s ease-out;
+  }
+  .reveal.visible{
+    opacity:1; transform:translateY(0);
+  }
+  .reveal-delay-1{ transition-delay:0.1s; }
+  .reveal-delay-2{ transition-delay:0.2s; }
+  .reveal-delay-3{ transition-delay:0.3s; }
+  .reveal-delay-4{ transition-delay:0.4s; }
+
   ::selection{ background:var(--gold); color:var(--ink); }
   a{ color:inherit; text-decoration:none; }
   button{ font-family:inherit; cursor:pointer; border:none; }
@@ -65,6 +92,12 @@
     display:flex; align-items:center; justify-content:center;
     font-family:var(--font-mono); font-size:10.5px; font-weight:600; color:var(--gold-light);
   }
+  .lang-toggle{
+    font-family:var(--font-mono); font-size:11px; letter-spacing:0.04em;
+    background:transparent; border:1px solid rgba(246,241,228,0.25); color:rgba(246,241,228,0.55);
+    padding:4px 10px; border-radius:12px; cursor:pointer; transition:all .15s;
+  }
+  .lang-toggle:hover{ border-color:var(--gold-light); color:var(--gold-light); }
   .nav-cta{
     font-family:var(--font-mono); font-size:12px; letter-spacing:0.04em;
     background:var(--gold); color:var(--ink); padding:9px 16px; border-radius:20px; font-weight:600;
@@ -73,6 +106,8 @@
 
   /* ===== hero ===== */
   .hero{ padding:76px 0 60px; position:relative; z-index:1; }
+  .hero-content{ opacity:0; transform:translateY(20px); transition:all 0.7s ease-out; }
+  .hero-content.visible{ opacity:1; transform:translateY(0); }
   .hero-inner{ display:grid; grid-template-columns:1.1fr 0.9fr; gap:48px; align-items:center; }
   .eyebrow{
     font-family:var(--font-mono); font-size:11.5px; letter-spacing:0.14em; text-transform:uppercase;
@@ -132,6 +167,8 @@
 
   /* ===== problem/solution ===== */
   .split{ padding:64px 0; }
+  .split-card{ opacity:0; transform:translateY(24px); transition:all 0.5s ease-out; }
+  .split-card.visible{ opacity:1; transform:translateY(0); }
   .split-head{ text-align:center; max-width:560px; margin:0 auto 44px; }
   .split-head .kicker{
     font-family:var(--font-mono); font-size:11px; letter-spacing:0.14em; text-transform:uppercase;
@@ -190,7 +227,6 @@
   .stat b{ display:block; font-family:var(--font-display); font-size:26px; font-weight:600; color:var(--gold-light); }
   .stat span{ font-family:var(--font-mono); font-size:11px; color:rgba(246,241,228,0.55); text-transform:uppercase; letter-spacing:0.06em; }
 
-  /* ===== seller callout (unused — admin internal) ===== */
   /* ===== footer ===== */
   footer{ padding:50px 0 40px; border-top:1px solid var(--line); }
   .foot-inner{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; }
@@ -215,27 +251,30 @@
 </head>
 <body>
 
+<div id="loader"><div class="spinner"></div></div>
+
 <nav>
   <div class="nav-inner">
     <div class="brand"><span class="brand-mark">CT</span> ChainTrinket</div>
     <div style="display:flex; gap:10px; align-items:center;">
-      <a href="catalog.html" style="font-family:var(--font-mono); font-size:12px; color:rgba(246,241,228,0.6);">Katalog</a>
-      <a href="admin.html" style="font-family:var(--font-mono); font-size:12px; color:rgba(246,241,228,0.35);">Admin</a>
-      <a class="nav-cta" href="#how">Cara belanja &rarr;</a>
+      <button class="lang-toggle" onclick="I18N.toggle()">ID</button>
+      <a href="catalog.html" data-i18n="nav.catalog" style="font-family:var(--font-mono); font-size:12px; color:rgba(246,241,228,0.6);">Catalog</a>
+      <a href="admin.html" data-i18n="nav.admin" style="font-family:var(--font-mono); font-size:12px; color:rgba(246,241,228,0.35);">Admin</a>
+      <a class="nav-cta" href="#how" data-i18n="nav.how">How to buy →</a>
     </div>
   </div>
 </nav>
 
 <!-- ===== HERO ===== -->
 <section class="hero">
-  <div class="container hero-inner">
+  <div class="container hero-inner hero-content" id="heroContent">
     <div>
-      <div class="eyebrow"><span class="dot"></span> Live di event crypto &middot; Stellar Testnet</div>
-      <h1 class="headline">Aksesoris fisik,<br><em>bukti kepemilikan</em><br>on-chain.</h1>
-      <p class="sub">Gelang, kalung, cincin — tiap barang punya satu token di Stellar. Scan tag-nya, lihat siapa pemiliknya, dan bawa pulang langsung dari lapak. Gak perlu paham crypto buat mulai.</p>
+      <div class="eyebrow"><span class="dot"></span> <span data-i18n="home.hero.badge">Live at crypto events · Stellar Testnet</span></div>
+      <h1 class="headline"><span data-i18n="home.hero.h1a">Physical accessories,</span><br><em data-i18n="home.hero.h1b">ownership proof</em><br><span data-i18n="home.hero.h1c">on-chain.</span></h1>
+      <p class="sub" data-i18n="home.hero.sub">Bracelets, necklaces, rings — each item has one token on Stellar. Scan the tag, see the owner, and take it home from the booth. No crypto knowledge needed to start.</p>
       <div class="hero-ctas">
-        <a class="btn btn-primary" href="#how">Lihat cara belanja</a>
-        <a class="btn btn-ghost" href="catalog.html">Lihat katalog</a>
+        <a class="btn btn-primary" href="#how" data-i18n="home.hero.cta1">See how to buy</a>
+        <a class="btn btn-ghost" href="catalog.html" data-i18n="home.hero.cta2">Browse catalog</a>
       </div>
     </div>
     <div class="hero-visual">
@@ -253,9 +292,9 @@
               </g>
             </svg>
           </div>
-          <div class="ht-name">Gelang Manik Biru</div>
+          <div class="ht-name" data-i18n="home.hero.tag">Blue Bead Bracelet</div>
           <div class="ht-price">0.5 XLM</div>
-          <div class="ht-stamp">&#10003; Verified &middot; #3/10</div>
+          <div class="ht-stamp" data-i18n="home.hero.stamp">✓ Verified · #3/10</div>
         </div>
       </div>
     </div>
@@ -266,29 +305,29 @@
 <section class="split">
   <div class="container">
     <div class="split-head">
-      <div class="kicker">Kenapa ChainTrinket</div>
-      <h2>Barang second di event susah dipercaya —<br>sekarang ada buktinya.</h2>
+      <div class="kicker" data-i18n="home.why.kicker">Why ChainTrinket</div>
+      <h2 data-i18n="home.why.h2">Second-hand items at events are hard to trust —<br>now there's proof.</h2>
     </div>
     <div class="cards">
-      <div class="card">
-        <span class="tag">Sebelum</span>
-        <h3>Gak ada cara verifikasi keaslian</h3>
-        <p>Pembeli ragu beli aksesoris second karena gak ada riwayat kepemilikan yang bisa dicek.</p>
+      <div class="card split-card">
+        <span class="tag" data-i18n="home.before">Before</span>
+        <h3 data-i18n="home.card1h">No way to verify authenticity</h3>
+        <p data-i18n="home.card1p">Buyers hesitate on second-hand accessories because there's no ownership history to verify.</p>
       </div>
-      <div class="card good">
-        <span class="tag">Sesudah</span>
-        <h3>Riwayat tercatat, bisa dicek siapa saja</h3>
-        <p>Scan QR di barang → langsung lihat pemilik saat ini dan riwayat lengkapnya di chain.</p>
+      <div class="card good split-card">
+        <span class="tag" data-i18n="home.after">After</span>
+        <h3 data-i18n="home.card2h">History recorded, verifiable by anyone</h3>
+        <p data-i18n="home.card2p">Scan QR on the item → instantly see the current owner and full history on-chain.</p>
       </div>
-      <div class="card">
-        <span class="tag">Sebelum</span>
-        <h3>Penjual mikro gak punya sistem kepemilikan</h3>
-        <p>Sulit bangun trust ke pembeli tanpa sistem pencatatan yang kredibel.</p>
+      <div class="card split-card">
+        <span class="tag" data-i18n="home.before">Before</span>
+        <h3 data-i18n="home.card3h">Micro-sellers lack ownership systems</h3>
+        <p data-i18n="home.card3p">Hard to build buyer trust without a credible recording system.</p>
       </div>
-      <div class="card good">
-        <span class="tag">Sesudah</span>
-        <h3>Mint sekali, token urus sisanya</h3>
-        <p>Upload foto &amp; harga, sistem generate QR — kepemilikan pindah otomatis pas terjual.</p>
+      <div class="card good split-card">
+        <span class="tag" data-i18n="home.after">After</span>
+        <h3 data-i18n="home.card4h">Mint once, the token handles the rest</h3>
+        <p data-i18n="home.card4p">Upload photo & price, system generates QR — ownership transfers automatically when sold.</p>
       </div>
     </div>
   </div>
@@ -298,49 +337,79 @@
 <section class="how" id="how">
   <div class="container">
     <div class="split-head">
-      <div class="kicker">Cara belanja</div>
-      <h2>Dua jalur — sama-sama 4 langkah.</h2>
+      <div class="kicker" data-i18n="home.how.kicker">How to buy</div>
+      <h2 data-i18n="home.how.h2">Two paths — both 4 steps.</h2>
     </div>
 
     <div class="tabs">
-      <button class="tab-btn active" onclick="showLane('awam', event)">Pembeli awam &middot; QRIS</button>
-      <button class="tab-btn" onclick="showLane('crypto', event)">Pembeli crypto &middot; Wallet</button>
+      <button class="tab-btn active" data-i18n="home.tab.casual" onclick="showLane('awam', event)">Casual buyers · QRIS</button>
+      <button class="tab-btn" data-i18n="home.tab.crypto" onclick="showLane('crypto', event)">Crypto buyers · Wallet</button>
     </div>
 
     <div class="lane active" id="lane-awam">
-      <div class="step"><span class="num">01</span><h4>Scan tag</h4><p>Pakai kamera HP, gak perlu install apa-apa.</p></div>
-      <div class="step"><span class="num">02</span><h4>Lihat detail</h4><p>Foto, harga, dan status barang muncul langsung.</p></div>
-      <div class="step"><span class="num">03</span><h4>Bayar QRIS</h4><p>GoPay, OVO, Dana, atau m-banking — seperti biasa.</p></div>
-      <div class="step"><span class="num">04</span><h4>Ambil barang</h4><p>Notif kepemilikan masuk, tunjukin ke seller, bawa pulang.</p></div>
+      <div class="step">
+        <span class="num">01</span>
+        <h4 data-i18n="home.step1a.title">Scan the tag</h4>
+        <p data-i18n="home.step1a.desc">Use your phone camera, no installation needed.</p>
+      </div>
+      <div class="step">
+        <span class="num">02</span>
+        <h4 data-i18n="home.step2a.title">See details</h4>
+        <p data-i18n="home.step2a.desc">Photo, price, and item status appear instantly.</p>
+      </div>
+      <div class="step">
+        <span class="num">03</span>
+        <h4 data-i18n="home.step3a.title">Pay with QRIS</h4>
+        <p data-i18n="home.step3a.desc">GoPay, OVO, Dana, or mobile banking — as usual.</p>
+      </div>
+      <div class="step">
+        <span class="num">04</span>
+        <h4 data-i18n="home.step4a.title">Pick up item</h4>
+        <p data-i18n="home.step4a.desc">Ownership notification received, show the seller, take it home.</p>
+      </div>
     </div>
 
     <div class="lane" id="lane-crypto">
-      <div class="step"><span class="num">01</span><h4>Scan tag</h4><p>Atau buka link dari story/social media event.</p></div>
-      <div class="step"><span class="num">02</span><h4>Connect wallet</h4><p>Freighter, Lobstr, atau xBull — pilih salah satu.</p></div>
-      <div class="step"><span class="num">03</span><h4>Konfirmasi XLM</h4><p>Bayar dengan XLM atau USDC langsung dari wallet.</p></div>
-      <div class="step"><span class="num">04</span><h4>Token masuk wallet</h4><p>Tunjukin bukti di HP, ambil barang di tempat — gak perlu kirim.</p></div>
+      <div class="step">
+        <span class="num">01</span>
+        <h4 data-i18n="home.step1b.title">Scan the tag</h4>
+        <p data-i18n="home.step1b.desc">Or open a link from event stories/social media.</p>
+      </div>
+      <div class="step">
+        <span class="num">02</span>
+        <h4 data-i18n="home.step2b.title">Connect wallet</h4>
+        <p data-i18n="home.step2b.desc">Freighter, Lobstr, or xBull — pick one.</p>
+      </div>
+      <div class="step">
+        <span class="num">03</span>
+        <h4 data-i18n="home.step3b.title">Confirm XLM</h4>
+        <p data-i18n="home.step3b.desc">Pay with XLM or USDC directly from your wallet.</p>
+      </div>
+      <div class="step">
+        <span class="num">04</span>
+        <h4 data-i18n="home.step4b.title">Token enters wallet</h4>
+        <p data-i18n="home.step4b.desc">Show proof on your phone, pick up the item — no shipping needed.</p>
+      </div>
     </div>
 
-    <div class="lane-foot">Token pindah otomatis di kontrak <code>trinket_token</code> begitu pembayaran terverifikasi.</div>
+    <div class="lane-foot" data-i18n="home.how.foot">Tokens transfer automatically in the trinket_token contract once payment is verified.</div>
   </div>
 </section>
 
 <!-- ===== STATS STRIP ===== -->
 <section class="strip">
   <div class="container strip-inner">
-    <div class="stat"><b>10</b><span>Token diterbitkan</span></div>
-    <div class="stat"><b>&lt;30s</b><span>Waktu bayar QRIS</span></div>
-    <div class="stat"><b>&lt;0.01</b><span>XLM gas per transaksi</span></div>
-    <div class="stat"><b>100%</b><span>Riwayat on-chain</span></div>
+    <div class="stat"><b>10</b><span data-i18n="home.stat.tokens">Tokens issued</span></div>
+    <div class="stat"><b>&lt;30s</b><span data-i18n="home.stat.qris">QRIS payment time</span></div>
+    <div class="stat"><b>&lt;0.01</b><span data-i18n="home.stat.gas">XLM gas per transaction</span></div>
+    <div class="stat"><b>100%</b><span data-i18n="home.stat.history">On-chain history</span></div>
   </div>
 </section>
 
-<!-- ===== (seller section dihapus — admin internal) ===== -->
-
 <footer>
   <div class="container foot-inner">
-    <div class="foot-mono">ChainTrinket &middot; Fashion on-chain<br>Contract <code>trinket_token</code> &middot; Soroban SDK</div>
-    <div class="net-badge"><span style="width:6px;height:6px;border-radius:50%;background:#5fd694;display:inline-block;"></span> Stellar Testnet</div>
+    <div class="foot-mono">ChainTrinket · <span data-i18n="home.footer.sub">Fashion on-chain</span><br>Contract <code>trinket_token</code> · Soroban SDK</div>
+    <div class="net-badge"><span style="width:6px;height:6px;border-radius:50%;background:#5fd694;display:inline-block;"></span> <span data-i18n="net.testnet">Stellar Testnet</span></div>
   </div>
 </footer>
 
@@ -351,6 +420,31 @@
     document.getElementById('lane-awam').classList.toggle('active', name==='awam');
     document.getElementById('lane-crypto').classList.toggle('active', name==='crypto');
   }
+
+  // Loader
+  window.addEventListener('load', () => {
+    const loader = document.getElementById('loader');
+    if (loader) {
+      loader.style.opacity = '0';
+      setTimeout(() => loader.style.display = 'none', 500);
+    }
+  });
+
+  // Reveal on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.reveal, .split-card, .hero-content').forEach(el => {
+    observer.observe(el);
+  });
+
+  I18N.apply();
 </script>
 
 </body>

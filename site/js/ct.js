@@ -117,6 +117,26 @@ const CT = (() => {
       const prep = await sv.prepareTransaction(tx);
       return await signAndSend(prep, from);
     },
+    // New: purchase via Horizon (Stellar payment, not Soroban)
+    purchase: async (buyerKey, id, amountXlm) => {
+      const horizon = new StellarSdk.Horizon.Server('https://horizon-testnet.stellar.org');
+      const acc = await horizon.loadAccount(buyerKey);
+      const tx = new StellarSdk.TransactionBuilder(acc, { fee: '1000', networkPassphrase: CONFIG.networkPassphrase })
+        .addOperation(StellarSdk.Operation.payment({
+           destination: CONFIG.admin,
+           asset: StellarSdk.Asset.native(),
+           amount: amountXlm
+        }))
+        .setTimeout(30).build();
+      const xdr = tx.toXDR();
+      const { signedTxXdr, error: signErr } = await window.freighterApi.signTransaction(xdr, {
+        networkPassphrase: CONFIG.networkPassphrase,
+        address: buyerKey
+      });
+      if (signErr) throw new Error('Sign failed: ' + signErr.message);
+      const signedTx = StellarSdk.TransactionBuilder.fromXDR(signedTxXdr, CONFIG.networkPassphrase);
+      return await horizon.submitTransaction(signedTx);
+    },
     connectFreighter,
     getFreighterAddress,
     freighterAvailable,

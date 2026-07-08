@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ChainTrinket — Katalog</title>
+<title data-i18n="catalog.title">ChainTrinket — Collection</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="./js/i18n.js"></script>
 <style>
   :root{
     --bg:#0e0f0c; --bg-2:#15160f; --bg-3:#1c1e14;
@@ -23,9 +24,21 @@
     margin:0; background:var(--bg); color:var(--paper);
     font-family:var(--font-body); -webkit-font-smoothing:antialiased;
   }
+  
+  /* Loading Animation */
+  .skeleton{
+    background-color: var(--bg-3);
+    background-image: linear-gradient(90deg, var(--bg-3) 0px, #26291d 40px, var(--bg-3) 80px);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.5s infinite linear;
+  }
+  @keyframes skeleton-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
   a{ color:inherit; text-decoration:none; }
   button{ font-family:inherit; cursor:pointer; border:none; }
-  :focus-visible{ outline:2px solid var(--gold-light); outline-offset:2px; }
 
   .topbar{
     position:sticky; top:0; z-index:20;
@@ -41,6 +54,12 @@
     font-family:var(--font-mono); font-size:10px; font-weight:600; color:var(--gold-light);
   }
   .brand-sub{ font-family:var(--font-mono); font-size:11px; color:rgba(246,241,228,0.45); margin-left:10px; }
+  .lang-toggle{
+    font-family:var(--font-mono); font-size:11px; letter-spacing:0.04em;
+    background:transparent; border:1px solid rgba(246,241,228,0.25); color:rgba(246,241,228,0.55);
+    padding:4px 10px; border-radius:12px; cursor:pointer;
+  }
+  .lang-toggle:hover{ border-color:var(--gold-light); color:var(--gold-light); }
 
   .wrap{ max-width:1100px; margin:0 auto; padding:30px 24px 80px; }
 
@@ -51,16 +70,18 @@
   .filter-btn{
     padding:9px 16px; border-radius:20px; font-size:12px;
     background:transparent; border:1.5px solid rgba(246,241,228,0.2); color:rgba(246,241,228,0.6);
-    font-family:var(--font-mono); font-weight:500;
+    font-family:var(--font-mono); font-weight:500; transition:all 0.2s;
   }
   .filter-btn.active{ background:var(--gold); color:var(--ink); border-color:var(--gold); font-weight:600; }
 
   .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px; }
   .card{
     background:var(--bg-3); border:1px solid var(--line); border-radius:10px;
-    padding:18px; cursor:pointer; transition:border-color .15s, transform .12s;
+    padding:18px; cursor:pointer; transition:border-color .15s, transform .2s;
+    opacity:0; transform:translateY(20px);
   }
-  .card:hover{ border-color:rgba(201,162,39,0.5); transform:translateY(-2px); }
+  .card.show{ opacity:1; transform:translateY(0); transition:all 0.5s ease-out; }
+  .card:hover{ border-color:rgba(201,162,39,0.5); transform:translateY(-5px); }
   .card-img{ text-align:center; margin:6px 0 12px; }
   .status-row{ display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
   .pill{
@@ -75,7 +96,7 @@
   .price-xlm{ font-family:var(--font-mono); font-size:13px; color:var(--ink-soft); }
   .btn-card{
     padding:8px 12px; border-radius:4px; font-size:12px; font-weight:600;
-    background:transparent; border:1.5px solid rgba(246,241,228,0.25); color:var(--paper);
+    background:transparent; border:1.5px solid rgba(246,241,228,0.25); color:var(--paper); transition:all 0.2s;
   }
   .btn-card:hover{ border-color:var(--gold-light); color:var(--gold-light); }
   .empty{
@@ -91,26 +112,29 @@
 <body>
 
 <div class="topbar">
-  <a href="home.html" class="brand"><span class="brand-mark">CT</span> ChainTrinket<span class="brand-sub">/ katalog</span></a>
-  <div style="display:flex;gap:10px;">
-    <a href="admin.html" style="font-family:var(--font-mono);font-size:11.5px;color:rgba(246,241,228,0.35);padding:6px 10px;">Admin</a>
+  <a href="home.html" class="brand"><span class="brand-mark">CT</span> ChainTrinket<span class="brand-sub">/</span></a>
+  <div style="display:flex;gap:10px;align-items:center;">
+    <button class="lang-toggle" onclick="I18N.toggle()">ID</button>
+    <a href="admin.html" data-i18n="nav.admin" style="font-family:var(--font-mono);font-size:11.5px;color:rgba(246,241,228,0.35);padding:6px 10px;">Admin</a>
   </div>
 </div>
 
 <div class="wrap">
   <div class="page-head">
-    <h1>Koleksi</h1>
-    <p>Semua produk ChainTrinket — tokenisasi aksesoris di Stellar Soroban</p>
+    <h1 data-i18n="catalog.title">Collection</h1>
+    <p data-i18n="catalog.sub">All ChainTrinket products — accessory tokenization on Stellar Soroban</p>
   </div>
 
   <div class="filter-bar">
-    <button class="filter-btn active" onclick="filterProducts('all',this)">Semua</button>
-    <button class="filter-btn" onclick="filterProducts('available',this)">Tersedia</button>
-    <button class="filter-btn" onclick="filterProducts('sold',this)">Terjual</button>
+    <button class="filter-btn active" data-i18n="catalog.filter.all" onclick="filterProducts('all',this)">All</button>
+    <button class="filter-btn" data-i18n="catalog.filter.avail" onclick="filterProducts('available',this)">Available</button>
+    <button class="filter-btn" data-i18n="catalog.filter.sold" onclick="filterProducts('sold',this)">Sold</button>
   </div>
 
   <div class="grid" id="productGrid">
-    <div class="empty"><b>Memuat...</b>Tunggu sebentar</div>
+    <div class="skeleton" style="height:320px;border-radius:10px;margin-bottom:0;display:block;"></div>
+    <div class="skeleton" style="height:320px;border-radius:10px;margin-bottom:0;display:block;"></div>
+    <div class="skeleton" style="height:320px;border-radius:10px;margin-bottom:0;display:block;"></div>
   </div>
 </div>
 
@@ -123,24 +147,26 @@
   async function loadCatalog() {
     try {
       allTokens = await CT.getAllTokens();
-      render('all');
+      // Skeleton removed automatically once allTokens populated
+      render();
     } catch(e) {
       console.error('loadCatalog', e);
-      document.getElementById('productGrid').innerHTML = '<div class="empty"><b>Gagal muat</b>Tidak dapat terhubung ke Soroban</div>';
+      document.getElementById('productGrid').innerHTML = '<div class="empty"><b data-i18n="error.load">' + I18N.t('error.load') + '</b><span>' + I18N.t('error.network') + '</span></div>';
     }
   }
 
   function render(filter) {
+    const curFilter = filter || document.querySelector('.filter-btn.active')?.dataset?.filter || 'all';
     const grid = document.getElementById('productGrid');
-    const filtered = filter === 'all' ? allTokens : allTokens.filter(p => p.status === filter);
+    const filtered = curFilter === 'all' ? allTokens : allTokens.filter(p => p.status === curFilter);
     if (!filtered.length) {
-      grid.innerHTML = '<div class="empty"><b>Gak ada produk</b>Tidak ada produk dengan filter ini</div>';
+      grid.innerHTML = '<div class="empty"><b>' + I18N.t('empty.title') + '</b><span>' + I18N.t('empty.sub') + '</span></div>';
       return;
     }
     grid.innerHTML = filtered.map((p, i) => {
       const color = swatches[p.id % swatches.length];
       return `
-        <div class="card" onclick="location.href='product.html?id=${p.id}'">
+        <div class="card" onclick="location.href='product.html?id=${p.id}'" style="transition-delay:${i*0.05}s">
           <div class="card-img">
             <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
               <circle cx="40" cy="40" r="28" stroke="${color}" stroke-width="1.5"/>
@@ -154,28 +180,35 @@
           </div>
           <div class="card-body">
             <div class="status-row">
-              <span class="pill ${p.status}">${p.status === 'available' ? 'Tersedia' : 'Terjual'}</span>
-              <span class="token-id">#${p.id}/${allTokens.length}</span>
+              <span class="pill ${p.status}">${p.status === 'available' ? I18N.t('status.available') : I18N.t('status.sold')}</span>
+              <span class="token-id">${I18N.t('token.of', {i: p.id, n: allTokens.length})}</span>
             </div>
             <h3>${p.name}</h3>
             <div class="price-row">
               <span class="price-xlm" style="font-size:17px;font-weight:600;">${CT.formatPrice(p.price)}</span>
             </div>
             <div class="row-actions">
-              <button class="btn-card" onclick="event.stopPropagation();location.href='product.html?id=${p.id}'">Detail</button>
+              <button class="btn-card" onclick="event.stopPropagation();location.href='product.html?id=${p.id}'">${I18N.t('btn.detail')}</button>
             </div>
           </div>
         </div>`;
     }).join('');
+    
+    // Trigger animation
+    setTimeout(() => {
+      document.querySelectorAll('.card').forEach(c => c.classList.add('show'));
+    }, 50);
   }
 
   function filterProducts(filter, btn) {
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
+    btn.dataset.filter = filter;
     render(filter);
   }
 
   loadCatalog();
+  I18N.apply();
 </script>
 
 </body>

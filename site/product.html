@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>ChainTrinket — Gelang Manik Biru</title>
+<title data-i18n="product.title">ChainTrinket — Blue Bead Bracelet</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="./js/i18n.js"></script>
 <style>
   :root{
     --bg:#0e0f0c;
@@ -50,7 +51,7 @@
     position:relative;
   }
 
-  /* ---------- Header ---------- */
+  /* topbar */
   .topbar{
     display:flex; align-items:center; justify-content:space-between;
     padding:4px 2px 22px;
@@ -66,6 +67,12 @@
     display:flex; align-items:center; justify-content:center;
     font-family:var(--font-mono); font-size:11px; font-weight:600; color:var(--gold-light);
   }
+  .lang-toggle{
+    font-family:var(--font-mono); font-size:11px; letter-spacing:0.04em;
+    background:transparent; border:1px solid rgba(246,241,228,0.25); color:rgba(246,241,228,0.55);
+    padding:4px 10px; border-radius:12px; cursor:pointer;
+  }
+  .lang-toggle:hover{ border-color:var(--gold-light); color:var(--gold-light); }
   .net-badge{
     font-family:var(--font-mono); font-size:10.5px; letter-spacing:0.06em;
     color:var(--jade-light); background:rgba(47,110,75,0.18);
@@ -75,7 +82,7 @@
   }
   .dot{width:6px; height:6px; border-radius:50%; background:#5fd694; box-shadow:0 0 0 3px rgba(95,214,148,0.18);}
 
-  /* ---------- Hallmark tag card (hero) ---------- */
+  /* tag card */
   .tag-card{
     background:var(--paper);
     color:var(--ink);
@@ -85,7 +92,6 @@
     box-shadow:0 1px 0 rgba(255,255,255,0.4) inset, 0 22px 45px -18px rgba(0,0,0,0.6);
   }
   .tag-card::before{
-    /* punch hole, like a physical hang-tag */
     content:"";
     position:absolute; top:16px; left:50%; transform:translateX(-50%);
     width:14px; height:14px; border-radius:50%;
@@ -120,7 +126,6 @@
     letter-spacing:0.04em; margin-bottom:18px;
   }
 
-  /* hallmark stamp */
   .stamp{
     position:absolute; top:20px; right:16px;
     width:74px; height:74px; border-radius:50%;
@@ -141,7 +146,6 @@
     border:none; border-top:1px dashed rgba(27,27,22,0.22); margin:18px 0;
   }
 
-  /* ---------- Ownership ---------- */
   .row-label{
     font-family:var(--font-mono); font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase;
     color:var(--ink-soft); margin-bottom:6px;
@@ -161,7 +165,6 @@
   }
   .copy-btn:hover{ background:var(--paper-2); }
 
-  /* ---------- History ---------- */
   .history{ margin-top:16px; }
   .h-item{
     display:flex; gap:10px; padding:9px 0;
@@ -178,7 +181,6 @@
   .h-desc{ margin-top:1px; }
   .h-desc b{ font-weight:600; }
 
-  /* ---------- Buy actions ---------- */
   .actions{ margin-top:20px; display:flex; flex-direction:column; gap:10px; }
   .btn{
     width:100%; border:none; border-radius:3px; padding:15px 16px;
@@ -197,20 +199,18 @@
   .btn-wallet:hover{ background:rgba(27,27,22,0.06); }
   .btn[disabled]{ opacity:0.45; cursor:not-allowed; }
 
-  /* ---------- Footer note on card ---------- */
   .card-foot{
     margin-top:18px; text-align:center; font-family:var(--font-mono); font-size:10px;
     letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-soft);
   }
 
-  /* ---------- Contract footer ---------- */
   .contract-foot{
     margin-top:26px; text-align:center; font-family:var(--font-mono); font-size:11px;
     color:rgba(246,241,228,0.55); line-height:1.7;
   }
   .contract-foot a{ color:var(--gold-light); text-decoration:none; border-bottom:1px dotted rgba(228,199,103,0.5); }
 
-  /* ---------- Modal shell ---------- */
+  /* modal sheet */
   .overlay{
     position:fixed; inset:0; background:rgba(9,10,7,0.72);
     display:flex; align-items:flex-end; justify-content:center;
@@ -235,7 +235,6 @@
     background:none; border:none; font-size:18px; color:var(--ink-soft); padding:4px;
   }
 
-  /* wallet list */
   .wallet-opt{
     width:100%; display:flex; align-items:center; gap:12px;
     background:var(--paper-2); border:1.5px solid transparent; border-radius:8px;
@@ -250,16 +249,15 @@
   }
   .wallet-sub{ font-size:11px; font-weight:400; color:var(--ink-soft); margin-top:1px; }
 
-  /* status stepper */
   .stepper{
     display:flex; align-items:center; justify-content:center; gap:6px; margin:18px 0 6px;
   }
-  .step{
+  .step-dot{
     width:9px; height:9px; border-radius:50%; background:var(--paper-2);
     border:1.5px solid rgba(27,27,22,0.2);
   }
-  .step.active{ background:var(--gold); border-color:var(--gold); }
-  .step.done{ background:var(--jade); border-color:var(--jade); }
+  .step-dot.active{ background:var(--gold); border-color:var(--gold); }
+  .step-dot.done{ background:var(--jade); border-color:var(--jade); }
 
   .status-icon{
     width:64px; height:64px; margin:6px auto 10px; border-radius:50%;
@@ -311,13 +309,16 @@
 
   <div class="topbar">
     <a href="home.html" class="brand"><span class="brand-mark">CT</span> ChainTrinket</a>
-    <div class="net-badge"><span class="dot"></span> Stellar Testnet</div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="lang-toggle" onclick="I18N.toggle()">ID</button>
+      <div class="net-badge"><span class="dot"></span> <span data-i18n="net.testnet">Stellar Testnet</span></div>
+    </div>
   </div>
 
-  <!-- ===== Hallmark tag card ===== -->
+  <!-- tag card -->
   <div class="tag-card">
-    <div id="stamp" class="stamp available">Verified<br>Available</div>
-    <div id="supplyLabel" class="eyebrow">Hasil scan tag &middot; Token #3 / 10</div>
+    <div id="stamp" class="stamp available" data-i18n-html="product.verified">Verified<br>Available</div>
+    <div id="supplyLabel" class="eyebrow">Token #3 / 10</div>
 
     <div class="art">
       <svg width="150" height="150" viewBox="0 0 150 150" fill="none">
@@ -335,49 +336,48 @@
       </svg>
     </div>
 
-    <h1 id="productName" class="product-name">Gelang Manik Biru</h1>
-    <div class="rating"><b>&#9733; 4.8</b> &middot; 12 terjual di event</div>
+    <h1 id="productName" class="product-name">Blue Bead Bracelet</h1>
+    <div class="rating" data-i18n="product.rating"><b>★ 4.8</b> · 12 sold at events</div>
 
     <div class="price-row">
       <span id="priceXlm" class="price-xlm" style="font-size:22px;font-weight:700;">0.5 XLM</span>
     </div>
-    <div id="tokenLabel" class="token-idx">trinket_token &middot; id #3</div>
+    <div id="tokenLabel" class="token-idx">trinket_token · id #3</div>
 
     <hr class="divider">
 
-    <div class="row-label">Pemilik saat ini</div>
+    <div class="row-label" data-i18n="product.owner">Current owner</div>
     <div id="walletRow" class="owner-line">
-      <span id="ownerAddr" class="owner-addr">GD67&hellip;3F2A</span>
-      <button class="copy-btn" onclick="copyAddr()">Salin</button>
+      <span id="ownerAddr" class="owner-addr">GD67…3F2A</span>
+      <button class="copy-btn" onclick="copyAddr()" data-i18n="btn.copy">Copy</button>
     </div>
 
-    <div id="historyBody" class="history">
-    </div>
+    <div id="historyBody" class="history"></div>
 
     <div id="actions" class="actions">
-      <button id="btnQris" class="btn btn-qris" onclick="openQris()">Bayar dengan QRIS</button>
-      <button id="btnWallet" class="btn btn-wallet" onclick="openSheet('overlayWallet')">Sambungkan Wallet</button>
+      <button id="btnQris" class="btn btn-qris" onclick="openQris()" data-i18n="product.buy.qris">Pay with QRIS</button>
+      <button id="btnWallet" class="btn btn-wallet" onclick="openSheet('overlayWallet')" data-i18n="product.buy.wallet">Connect Wallet</button>
     </div>
 
-    <div class="card-foot">Token pindah otomatis &middot; tercatat selamanya on-chain</div>
+    <div class="card-foot" data-i18n="product.foot.token">Token transfers automatically · permanently recorded on-chain</div>
   </div>
 
   <div class="contract-foot">
-    Contract <a id="linkContract" href="#">CB3K&hellip;T9Q2</a> di Stellar Explorer<br>
-    Powered by Soroban
+    <span data-i18n="product.contract">Contract {{addr}} on Stellar Explorer</span><br>
+    <span data-i18n="contract.powered">Powered by Soroban</span>
   </div>
 </div>
 
-<!-- ===== QRIS Sheet ===== -->
+<!-- QRIS Sheet -->
 <div class="overlay" id="overlayQris">
   <div class="sheet">
     <div class="sheet-head">
-      <span class="sheet-title">Bayar via QRIS</span>
-      <button class="sheet-close" onclick="closeSheet('overlayQris')">&times;</button>
+      <span class="sheet-title" data-i18n="product.qris.title">Pay via QRIS</span>
+      <button class="sheet-close" onclick="closeSheet('overlayQris')">×</button>
     </div>
 
     <div id="qrisBody">
-      <div class="stepper"><span class="step active" id="qs1"></span><span class="step" id="qs2"></span></div>
+      <div class="stepper"><span class="step-dot active" id="qs1"></span><span class="step-dot" id="qs2"></span></div>
       <div class="qr-box">
         <svg width="150" height="150" viewBox="0 0 150 150">
           <rect width="150" height="150" fill="#fff"/>
@@ -392,34 +392,34 @@
           </g>
         </svg>
       </div>
-      <div class="status-title">QRIS</div>
-      <div class="status-sub">Scan pakai kamera HP kamu — GoPay, OVO, Dana, semua bank support QRIS.</div>
-      <button class="sheet-btn" onclick="closeSheet('overlayQris')">Tutup</button>
-      <button class="sheet-btn secondary" onclick="closeSheet('overlayQris')">Batalkan</button>
+      <div class="status-title" data-i18n="product.qris.title">Pay via QRIS</div>
+      <div class="status-sub" data-i18n="product.qris.sub">Scan with your phone camera — GoPay, OVO, Dana, all banks support QRIS.</div>
+      <button class="sheet-btn" onclick="closeSheet('overlayQris')" data-i18n="btn.close">Close</button>
+      <button class="sheet-btn secondary" onclick="closeSheet('overlayQris')" data-i18n="btn.cancel">Cancel</button>
     </div>
   </div>
 </div>
 
-<!-- ===== Wallet Sheet ===== -->
+<!-- Wallet Sheet -->
 <div class="overlay" id="overlayWallet">
   <div class="sheet">
     <div class="sheet-head">
-      <span class="sheet-title">Sambungkan wallet</span>
-      <button class="sheet-close" onclick="closeSheet('overlayWallet')">&times;</button>
+      <span class="sheet-title" data-i18n="product.wallet.title">Connect wallet</span>
+      <button class="sheet-close" onclick="closeSheet('overlayWallet')">×</button>
     </div>
 
     <div id="walletList">
       <button class="wallet-opt" onclick="handleConnect('Freighter')">
         <span class="wallet-icon" style="background:#7c3aed;">F</span>
-        <span><div>Freighter</div><div class="wallet-sub">Ekstensi browser</div></span>
+        <span><div>Freighter</div><div class="wallet-sub" data-i18n="product.wallet.freighter.sub">Browser extension</div></span>
       </button>
       <button class="wallet-opt" onclick="handleConnect('Lobstr')">
         <span class="wallet-icon" style="background:#1f7a63;">L</span>
-        <span><div>Lobstr</div><div class="wallet-sub">Wallet mobile</div></span>
+        <span><div>Lobstr</div><div class="wallet-sub" data-i18n="product.wallet.lobstr.sub">Mobile wallet</div></span>
       </button>
       <button class="wallet-opt" onclick="handleConnect('xBull')">
         <span class="wallet-icon" style="background:#c9a227;">X</span>
-        <span><div>xBull</div><div class="wallet-sub">Ekstensi &amp; mobile</div></span>
+        <span><div>xBull</div><div class="wallet-sub" data-i18n="product.wallet.xbull.sub">Extension & mobile</div></span>
       </button>
     </div>
 
@@ -431,12 +431,64 @@
 <script src="https://cdn.jsdelivr.net/npm/@stellar/freighter-api@6.0.1/build/index.min.js"></script>
 <script src="./js/ct.js"></script>
 <script>
-  // ─── read tokenId from URL ───
   const params = new URLSearchParams(location.search);
   const TOKEN_ID = parseInt(params.get('id') || '1', 10);
   const ADMIN_ADDR = CT.CONFIG.admin;
 
   let connectedPubKey = null;
+  let currentTokenName = '';
+
+  function copyAddr() {
+    const full = document.getElementById('ownerAddr').dataset.full;
+    if (full) { navigator.clipboard.writeText(full); }
+  }
+
+  function openSheet(id) { document.getElementById(id).classList.add('show'); }
+  function closeSheet(id) { document.getElementById(id).classList.remove('show'); }
+
+  function openQris() { openSheet('overlayQris'); }
+
+  async function handleConnect(name) {
+    const fb = document.getElementById('walletFlow');
+    fb.style.display = 'block';
+    fb.innerHTML = '<div style="text-align:center;padding:18px;font-size:14px;color:var(--ink-soft);">' + I18N.t('admin.sell.confirm') + '</div>';
+    try {
+      const addr = await CT.connectFreighter();
+      connectedPubKey = addr;
+      fb.innerHTML = `
+        <div class="status-icon success" style="margin:6px auto 10px;">✓</div>
+        <div class="status-title">${CT.shortAddr(addr)}</div>
+        <div class="status-sub" style="margin-bottom:16px;">${I18N.t('product.buy.wallet')}</div>
+        <button class="sheet-btn" onclick="doBuy()" data-i18n="product.buy.now">Buy Now</button>
+        <button class="sheet-btn secondary" onclick="closeSheet('overlayWallet')" data-i18n="btn.cancel">Cancel</button>
+      `;
+    } catch(e) {
+      fb.innerHTML = '<div class="err-box"><span>⚠</span><span>' + e.message + '</span></div><button class="sheet-btn retry" onclick="handleConnect(\'' + name + '\')">' + I18N.t('btn.retry') + '</button>';
+    }
+  }
+
+  async function doBuy() {
+    if (!connectedPubKey) return;
+    const fb = document.getElementById('walletFlow');
+    fb.innerHTML = '<div style="text-align:center;padding:18px;font-size:14px;color:var(--ink-soft);">' + I18N.t('admin.sell.processing') + '</div>';
+    try {
+      const info = await CT.getInfo(TOKEN_ID);
+      const priceXlm = (Number(info.price) / 10_000_000).toFixed(2);
+      const pay = await CT.purchase(connectedPubKey, TOKEN_ID, String(priceXlm));
+      const txHash = pay.hash || '';
+      fb.innerHTML = `
+        <div class="status-icon success" style="margin:6px auto 10px;background:var(--jade-light);color:var(--jade);font-size:28px;">✓</div>
+        <div class="status-title">` + I18N.t('product.buy.success') + `</div>
+        <div class="status-sub" style="margin:8px 0 12px;font-size:14px;">${priceXlm} XLM · ${txHash.slice(0,8)}…${txHash.slice(-8)}</div>
+        <div style="background:var(--jade-light);color:var(--jade);border-radius:6px;padding:14px;font-size:13px;margin:14px 0;line-height:1.6;text-align:center;">
+          ✓ ` + I18N.t('product.buy.seller') + `
+        </div>
+        <button class="sheet-btn" onclick="closeSheet('overlayWallet')" data-i18n="btn.close">Close</button>
+      `;
+    } catch(e) {
+      fb.innerHTML = '<div class="err-box"><span>⚠</span><span>' + e.message + '</span></div><button class="sheet-btn retry" onclick="doBuy()" data-i18n="btn.retry">' + I18N.t('btn.retry') + '</button>';
+    }
+  }
 
   async function loadProduct() {
     const s = document.getElementById('stamp');
@@ -453,20 +505,20 @@
 
     try {
       const info = await CT.getInfo(TOKEN_ID);
-      if (!info) throw new Error('Token tidak ditemukan');
+      if (!info) throw new Error(I18N.t('error.notFound'));
 
+      currentTokenName = info.name;
       nameEl.textContent = info.name;
       priceXlmEl.textContent = CT.formatPrice(info.price);
-      tokenLabel.textContent = `trinket_token · id #${info.id}`;
+      tokenLabel.textContent = I18N.t('product.tokenId', {i: info.id});
 
       const isSold = info.status === 'sold';
-      s.className = `stamp ${isSold ? 'sold' : 'available'}`;
+      s.className = 'stamp ' + (isSold ? 'sold' : 'available');
       s.innerHTML = isSold ? 'Verified<br>Sold' : 'Verified<br>Available';
 
       addrEl.textContent = CT.shortAddr(info.owner);
       addrEl.dataset.full = info.owner;
 
-      // history
       const ts = info.created_at;
       const d = new Date(ts * 1000);
       const dateStr = d.toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' }) + ', ' + d.toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
@@ -475,7 +527,7 @@
           <span class="h-dot"></span>
           <div class="h-body">
             <div class="h-date">${dateStr}</div>
-            <div class="h-desc">Diterbitkan ke <b>${CT.shortAddr(info.owner)}</b> (mint)</div>
+            <div class="h-desc">${I18N.t('product.history.mint', {addr: CT.shortAddr(info.owner)})}</div>
           </div>
         </div>
       `;
@@ -483,100 +535,31 @@
       walletRow.style.display = isSold ? 'none' : 'flex';
       actions.style.display = isSold ? 'none' : 'flex';
 
-      linkContract.textContent = CT.shortAddr('CATZRF3HW437XOCX42NWDWZ6WRZ2IHFWBQSGMQPX3EGCKGE4B765XIEP');
-      linkContract.href = 'https://stellar.expert/explorer/testnet/contract/CATZRF3HW437XOCX42NWDWZ6WRZ2IHFWBQSGMQPX3EGCKGE4B765XIEP';
+      const contractEl = document.getElementById('linkContract');
+      if (contractEl) {
+        contractEl.textContent = CT.shortAddr(CT.CONFIG.contractId);
+        contractEl.href = 'https://stellar.expert/explorer/testnet/contract/' + CT.CONFIG.contractId;
+      }
 
       const sup = await CT.totalSupply();
-      supplyLabel.textContent = `Token #${TOKEN_ID} / ${sup}`;
+      supplyLabel.textContent = I18N.t('token.of', {i: TOKEN_ID, n: sup});
     } catch(e) {
       console.error('loadProduct error:', e);
       s.className = 'stamp sold';
-      s.innerHTML = 'Error<br>Offline';
+      s.innerHTML = I18N.t('product.error.offline');
     }
   }
 
-  // ─── Wallet connect real ───
-  function openSheet(id) { document.getElementById(id).classList.add('show'); }
-  function closeSheet(id) {
-    document.getElementById(id).classList.remove('show');
-    if (id === 'overlayWallet') {
-      setTimeout(() => {
-        document.getElementById('walletList').style.display = 'block';
-        document.getElementById('walletFlow').style.display = 'none';
-        document.getElementById('walletFlow').innerHTML = '';
-      }, 220);
-    }
-  }
-
-  async function handleConnect(walletName) {
-    document.getElementById('walletList').style.display = 'none';
-    const flow = document.getElementById('walletFlow');
-    flow.style.display = 'block';
-
-    try {
-      if (walletName === 'Freighter') {
-        flow.innerHTML = `<div class="status-icon pending">&#128268;</div><div class="status-title">Menghubungkan Freighter&hellip;</div><div class="status-sub">Konfirmasi koneksi di popup Freighter.</div>`;
-        connectedPubKey = await CT.connectFreighter();
-      } else {
-        flow.innerHTML = `<div class="status-icon fail">&#10007;</div><div class="status-title">${walletName} belum support</div><div class="status-sub">Gunakan Freighter dulu untuk demo ini.</div><button class="sheet-btn secondary" onclick="closeSheet('overlayWallet')">Tutup</button>`;
-        return;
-      }
-
-      const priceStr = CT.formatPrice((await CT.getInfo(TOKEN_ID)).price);
-      flow.innerHTML = `
-        <div class="status-icon success"><span>&#10003;</span></div>
-        <div class="status-title">Wallet tersambung</div>
-        <div class="status-sub" style="word-break:break-all;font-family:var(--font-mono);font-size:13px;">${connectedPubKey}</div>
-        <div style="margin:10px 0;text-align:center;font-size:13px;color:var(--ink-soft);">Harga: ${priceStr}</div>
-        <div style="background:var(--paper-2);border-radius:6px;padding:12px;text-align:center;font-size:13px;line-height:1.5;">
-          Tunjukin alamat wallet kamu ke seller.<br>
-          Seller akan transfer token ke wallet kamu.
-        </div>
-        <button class="sheet-btn secondary" onclick="closeSheet('overlayWallet')">Tutup</button>
-      `;
-    } catch(e) {
-      flow.innerHTML = `
-        <div class="status-icon fail"><span>&#10007;</span></div>
-        <div class="status-title">Koneksi ditolak</div>
-        <div class="err-box"><span>&#9888;&#65039;</span><span>${e.message || 'Freighter tidak merespon.'}</span></div>
-        <button class="sheet-btn retry" onclick="handleConnect('${walletName}')">Coba lagi</button>
-        <button class="sheet-btn secondary" onclick="closeSheet('overlayWallet')">Tutup</button>
-      `;
-    }
-  }
-
-  // ─── QRIS fallback (simulate — needs backend) ───
-  function openQris() {
-    const body = document.getElementById('qrisBody');
-    body.innerHTML = `
-      <div class="status-icon pending">&#9203;</div>
-      <div class="status-title">QRIS belum aktif</div>
-      <div class="status-sub">Integrasi payment gateway (Midtrans/Xendit) menyusul tahap berikutnya.</div>
-      <button class="sheet-btn secondary" onclick="closeSheet('overlayQris')">Tutup</button>
-    `;
-    openSheet('overlayQris');
-  }
-
-  // ─── copy helpers ───
-  function copyAddr() {
-    const el = document.getElementById('ownerAddr');
-    const full = el.dataset.full || el.textContent;
-    navigator.clipboard?.writeText(full);
-    const btn = event.target;
-    const old = btn.textContent;
-    btn.textContent = 'Disalin';
-    setTimeout(() => btn.textContent = old, 1200);
-  }
-
-  // ─── wire globals so onclick works ───
+  // wire up
+  window.openQris = openQris;
   window.openSheet = openSheet;
   window.closeSheet = closeSheet;
   window.handleConnect = handleConnect;
+  window.doBuy = doBuy;
   window.copyAddr = copyAddr;
-  window.openQris = openQris;
 
-  // ─── init ───
   loadProduct();
+  I18N.apply();
 </script>
 
 </body>
