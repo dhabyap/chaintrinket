@@ -201,6 +201,15 @@ const I18N = (() => {
     'deployer.error.txFailed': { id: 'Transaksi gagal. Cek kontrak.', en: 'Transaction failed. Check the contract.' },
     'deployer.error.timeout': { id: 'Timeout nunggu konfirmasi.', en: 'Timeout waiting for confirmation.' },
     'deployer.error.generic': { id: 'Gagal: ', en: 'Failed: ' },
+
+    /* ─── my-items.html ─── */
+    'nav.myItems':      { id: 'Barang Saya', en: 'My Items' },
+    'myItems.title':    { id: 'Barang Saya', en: 'My Items' },
+    'myItems.sub':      { id: 'Koleksi trinket_token kamu di Stellar Soroban', en: 'Your trinket_token collection on Stellar Soroban' },
+    'myItems.connect':  { id: 'Sambungkan wallet untuk lihat barang kamu', en: 'Connect wallet to see your items' },
+    'myItems.empty':    { id: 'Belum punya barang', en: 'No items yet' },
+    'myItems.emptySub': { id: 'Barang yang kamu beli akan muncul di sini', en: 'Items you buy will appear here' },
+    'myItems.transfer': { id: 'Kirim', en: 'Transfer' },
   };
 
   let current = localStorage.getItem(STORAGE_KEY) || 'en';

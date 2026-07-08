@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChainTrinket — My Items</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="./js/i18n.js"></script>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://unpkg.com/@stellar/stellar-sdk@16.0.1/dist/stellar-sdk.min.js?v=2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@stellar/freighter-api@6.0.1/build/index.min.js"></script>
+<script src="./js/ct.js"></script>
+<style>
+  :root{
+    --bg:#0e0f0c; --bg-2:#15160f; --bg-3:#1c1e14;
+    --paper:#f6f1e4; --paper-2:#ece4d0; --paper-3:#e2d8bc;
+    --ink:#1b1b16; --ink-soft:#5b5748;
+    --gold:#c9a227; --gold-light:#e4c767;
+    --jade:#2f6e4b; --jade-light:#dceae1;
+    --rust:#a13d2b; --rust-light:#f1dcd3;
+    --line:rgba(246,241,228,0.12);
+    --font-display:'Fraunces', serif;
+    --font-body:'Space Grotesk', sans-serif;
+    --font-mono:'JetBrains Mono', monospace;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0; background:var(--bg); color:var(--paper);
+    font-family:var(--font-body); -webkit-font-smoothing:antialiased;
+  }
+  a{ color:inherit; text-decoration:none; }
+  button{ font-family:inherit; cursor:pointer; border:none; }
+  :focus-visible{ outline:2px solid var(--gold-light); outline-offset:2px; }
+
+  .skeleton{
+    background-color:var(--bg-3);
+    background-image:linear-gradient(90deg,var(--bg-3) 0px,#26291d 40px,var(--bg-3) 80px);
+    background-size:200% 100%;
+    animation:skeleton-shimmer 1.5s infinite linear;
+    display:block;
+  }
+  @keyframes skeleton-shimmer{
+    0%{background-position:200% 0}
+    100%{background-position:-200% 0}
+  }
+
+  .topbar{
+    position:sticky; top:0; z-index:20;
+    background:rgba(14,15,12,0.9); backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 24px;
+  }
+  .brand{ display:flex; align-items:center; gap:9px; font-family:var(--font-display); font-weight:700; font-size:17px; }
+  .brand-mark{
+    width:24px; height:24px; border-radius:50%; border:1.5px solid var(--gold);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-mono); font-size:10px; font-weight:600; color:var(--gold-light);
+  }
+  .nav-links{ display:flex; gap:4px; }
+  .nav-links a{
+    font-family:var(--font-mono); font-size:10.5px; letter-spacing:0.02em;
+    padding:6px 12px; border-radius:14px; color:rgba(246,241,228,0.45); transition:all .15s;
+  }
+  .nav-links a:hover, .nav-links a.active{ color:var(--gold-light); background:rgba(201,162,39,0.12); }
+  .topbar-right{ display:flex; align-items:center; gap:10px; }
+  .lang-toggle{
+    font-family:var(--font-mono); font-size:11px; letter-spacing:0.04em;
+    background:transparent; border:1px solid rgba(246,241,228,0.25); color:rgba(246,241,228,0.55);
+    padding:4px 10px; border-radius:12px; cursor:pointer;
+  }
+  .lang-toggle:hover{ border-color:var(--gold-light); color:var(--gold-light); }
+
+  .wrap{ max-width:820px; margin:0 auto; padding:30px 24px 80px; }
+
+  .page-head{ margin-bottom:22px; }
+  .page-head h1{ font-family:var(--font-display); font-weight:600; font-size:26px; margin:0 0 4px; }
+  .page-head p{ margin:0; font-size:13px; color:rgba(246,241,228,0.55); font-family:var(--font-mono); }
+
+  .wallet-bar{
+    display:flex; align-items:center; gap:10px; margin-bottom:22px;
+    padding:14px 18px; background:var(--bg-2); border:1px solid var(--line); border-radius:10px;
+  }
+  .wallet-bar .addr{ font-family:var(--font-mono); font-size:13px; flex:1; }
+  .wallet-bar .badge{ font-size:10.5px; font-family:var(--font-mono); color:var(--jade-light); background:rgba(47,110,75,0.16); padding:4px 10px; border-radius:14px; }
+  .btn-connect{
+    background:var(--gold); color:var(--ink); padding:9px 16px; border-radius:6px;
+    font-weight:600; font-size:12.5px;
+  }
+
+  .card-grid{ display:grid; gap:14px; }
+  .item-card{
+    display:flex; align-items:center; gap:16px;
+    background:var(--bg-2); border:1px solid var(--line); border-radius:12px;
+    padding:18px; transition:border-color .15s;
+  }
+  .item-card:hover{ border-color:rgba(201,162,39,0.3); }
+  .item-icon{
+    width:48px; height:48px; border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:22px; flex-shrink:0;
+  }
+  .item-body{ flex:1; min-width:0; }
+  .item-name{ font-weight:600; font-size:15px; }
+  .item-meta{ font-family:var(--font-mono); font-size:11.5px; color:rgba(246,241,228,0.5); margin-top:3px; }
+  .item-price{ font-family:var(--font-mono); font-size:14px; font-weight:500; color:var(--gold-light); white-space:nowrap; }
+  .item-actions{ display:flex; gap:6px; flex-shrink:0; }
+  .btn-sm{
+    padding:8px 14px; border-radius:6px; font-weight:600; font-size:12px;
+    transition:transform .12s;
+  }
+  .btn-sm:active{ transform:translateY(1px); }
+  .btn-gold{ background:var(--gold); color:var(--ink); }
+  .btn-ghost{ background:transparent; border:1px solid rgba(246,241,228,0.25); color:var(--paper); }
+
+  .empty-state{
+    text-align:center; padding:60px 20px; color:rgba(246,241,228,0.35);
+  }
+  .empty-state .big{ font-size:40px; margin-bottom:10px; }
+  .empty-state h3{ font-family:var(--font-display); font-weight:500; font-size:18px; margin:0 0 6px; color:var(--paper); }
+  .empty-state p{ font-size:13px; margin:0; font-family:var(--font-mono); }
+
+  /* overlay modal */
+  .overlay{
+    position:fixed; inset:0; background:rgba(9,10,7,0.72); z-index:50;
+    display:flex; align-items:center; justify-content:center; padding:20px;
+    opacity:0; pointer-events:none; transition:opacity .18s;
+    backdrop-filter:blur(2px);
+  }
+  .overlay.show{ opacity:1; pointer-events:auto; }
+  .modal{
+    background:var(--paper); color:var(--ink); border-radius:14px; width:100%; max-width:380px;
+    padding:24px; transform:translateY(10px); transition:transform .2s;
+    max-height:88vh; overflow-y:auto;
+  }
+  .overlay.show .modal{ transform:translateY(0); }
+  .modal-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+  .modal-head h3{ font-family:var(--font-display); font-weight:600; font-size:18px; margin:0; }
+  .modal-close{ background:none; font-size:18px; color:var(--ink-soft); padding:4px; }
+  .field{ margin-bottom:12px; }
+  .field label{ display:block; font-family:var(--font-mono); font-size:10px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:4px; }
+  .field input{
+    width:100%; padding:10px 12px; border-radius:6px; border:1.5px solid rgba(27,27,22,0.18);
+    font-family:var(--font-body); font-size:13px; background:var(--paper-2); color:var(--ink);
+  }
+  .modal-btn{ width:100%; padding:12px; border-radius:6px; font-weight:600; font-size:13.5px; margin-top:6px; }
+  .modal-btn.primary{ background:var(--ink); color:var(--paper); }
+  .modal-btn.ghost{ background:transparent; border:1.5px solid var(--ink); color:var(--ink); margin-top:8px; }
+  .err-box{
+    background:var(--rust-light); color:var(--rust); border-radius:6px;
+    padding:10px 12px; font-size:12px; margin:10px 0; line-height:1.5;
+  }
+  .success-box{
+    background:var(--jade-light); color:var(--jade); border-radius:6px;
+    padding:10px 12px; font-size:12px; margin:10px 0; text-align:center;
+  }
+
+  @media (max-width:600px){
+    .item-card{ flex-wrap:wrap; }
+    .item-actions{ width:100%; margin-top:8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="home.html" class="brand"><span class="brand-mark">CT</span> ChainTrinket</a>
+  <div class="topbar-right">
+    <button class="lang-toggle" onclick="I18N.toggle()">ID</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div id="root"></div>
+</div>
+
+<!-- Transfer Modal (React portal) -->
+<div class="overlay" id="transferOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Transfer Token</h3>
+      <button class="modal-close" onclick="closeTransferModal()">×</button>
+    </div>
+    <div class="field">
+      <label>Token ID</label>
+      <input type="text" id="transferTokenId" readonly style="background:var(--paper-3);">
+    </div>
+    <div class="field">
+      <label>Recipient wallet address</label>
+      <input type="text" id="transferAddr" placeholder="G... or C...">
+    </div>
+    <div id="transferStatus" style="display:none;"></div>
+    <button class="modal-btn primary" id="transferBtn" onclick="doTransfer()">Transfer</button>
+    <button class="modal-btn ghost" onclick="closeTransferModal()">Cancel</button>
+  </div>
+</div>
+
+<script type="text/babel">
+  const { useState, useEffect } = React;
+  const swatches = ['#c9a227','#2f6e4b','#a13d2b','#5b5748','#7a5d3b','#b87a4a'];
+
+  function shortAddr(a) { return a ? a.slice(0,4)+'…'+a.slice(-4) : ''; }
+  function formatPrice(p) { return (Number(p)/10_000_000).toFixed(2) + ' XLM'; }
+
+  function App() {
+    const [wallet, setWallet] = useState(null);
+    const [items, setItems] = useState(null); // null = loading
+    const [error, setError] = useState(null);
+
+    async function connect() {
+      try {
+        const addr = await CT.connectFreighter();
+        setWallet(addr);
+        loadMyItems(addr);
+      } catch(e) { setError(e.message); }
+    }
+
+    async function checkConnection() {
+      try {
+        const avail = await CT.freighterAvailable();
+        if (avail) {
+          const addr = await CT.getFreighterAddress().catch(() => null);
+          if (addr) { setWallet(addr); loadMyItems(addr); }
+          else setItems([]);
+        } else setItems([]);
+      } catch(e) { setItems([]); }
+    }
+
+    useEffect(() => { checkConnection(); }, []);
+
+    async function loadMyItems(addr) {
+      setItems(null);
+      setError(null);
+      try {
+        const n = await CT.totalSupply();
+        const mine = [];
+        for (let i = 1; i <= n; i++) {
+          try {
+            const t = await CT.getInfo(i);
+            if (t && t.owner === addr) mine.push(t);
+          } catch(e) {}
+        }
+        setItems(mine);
+      } catch(e) { setError(e.message); setItems([]); }
+    }
+
+    function openTransfer(tokenId) {
+      document.getElementById('transferTokenId').value = 'Token #' + tokenId;
+      document.getElementById('transferAddr').value = '';
+      document.getElementById('transferStatus').style.display = 'none';
+      document.getElementById('transferBtn').disabled = false;
+      document.getElementById('transferBtn').textContent = 'Transfer';
+      document.getElementById('transferOverlay').classList.add('show');
+      window._transferId = tokenId;
+    }
+
+    return (
+      <div>
+        <div className="page-head">
+          <h1>{I18N.t('myItems.title') || 'My Items'}</h1>
+          <p>{I18N.t('myItems.sub') || 'Your trinket_token collection on Stellar Soroban'}</p>
+        </div>
+
+        {!wallet ? (
+          <div className="wallet-bar">
+            <span style={{flex:1,fontFamily:'var(--font-mono)',fontSize:'13px',color:'rgba(246,241,228,0.45)'}}>
+              {I18N.t('myItems.connect') || 'Connect wallet to see your items'}
+            </span>
+            <button className="btn-connect" onClick={connect}>
+              {I18N.t('product.buy.connect') || 'Connect Wallet'}
+            </button>
+          </div>
+        ) : (
+          <div className="wallet-bar">
+            <span className="badge">● Stellar</span>
+            <span className="addr">{shortAddr(wallet)}</span>
+            <span style={{fontSize:'11px',color:'rgba(246,241,228,0.35)'}}>
+              {items !== null ? items.length + ' items' : '...'}
+            </span>
+          </div>
+        )}
+
+        {error && <div className="err-box">⚠ {error}</div>}
+
+        {items === null ? (
+          <div className="card-grid">
+            {[1,2,3].map(i => (
+              <div key={i} className="item-card">
+                <div className="skeleton" style={{width:48,height:48,borderRadius:10,flexShrink:0}}></div>
+                <div style={{flex:1}}>
+                  <div className="skeleton" style={{width:'60%',height:16,borderRadius:4,marginBottom:6}}></div>
+                  <div className="skeleton" style={{width:'35%',height:12,borderRadius:4}}></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : items.length === 0 ? (
+          <div className="empty-state">
+            <div className="big">◇</div>
+            <h3>{I18N.t('myItems.empty') || 'No items yet'}</h3>
+            <p>{I18N.t('myItems.emptySub') || 'Items you buy will appear here'}</p>
+          </div>
+        ) : (
+          <div className="card-grid">
+            {items.map((t, idx) => (
+              <div key={t.id} className="item-card">
+                <div className="item-icon" style={{background:swatches[idx%swatches.length]+'22',color:swatches[idx%swatches.length]}}>◆</div>
+                <div className="item-body">
+                  <div className="item-name">{t.name}</div>
+                  <div className="item-meta">{I18N.t('token.of', {i:t.id, n:items.length})}</div>
+                </div>
+                <div className="item-price">{formatPrice(t.price)}</div>
+                <div className="item-actions">
+                  <button className="btn-sm btn-gold" onClick={() => openTransfer(t.id)}>
+                    {I18N.t('myItems.transfer') || 'Transfer'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+
+<script>
+  window.closeTransferModal = () => {
+    document.getElementById('transferOverlay').classList.remove('show');
+    window._transferId = null;
+  };
+
+  window.doTransfer = async () => {
+    const id = window._transferId;
+    const to = document.getElementById('transferAddr').value.trim();
+    if (!to) return alert(I18N.t('admin.alert.buyerAddrReq'));
+    if (!to.startsWith('G') && !to.startsWith('C')) return alert(I18N.t('admin.alert.addrInvalid'));
+    const st = document.getElementById('transferStatus');
+    const btn = document.getElementById('transferBtn');
+    btn.disabled = true;
+    btn.textContent = I18N.t('admin.sell.processing');
+    st.style.display = 'block';
+    st.innerHTML = '<div style="text-align:center;padding:10px;font-size:13px;color:var(--ink-soft);">' + I18N.t('admin.sell.confirm') + '</div>';
+    try {
+      const addr = await CT.connectFreighter();
+      const result = await CT.transfer(addr, to, id);
+      const h = result.hash || '';
+      st.innerHTML = '<div class="success-box">✓ ' + I18N.t('admin.sell.success', {id}) + '<br><span style="font-family:var(--font-mono);font-size:11px;">' + h.slice(0,6)+'…'+h.slice(-6) + '</span></div>';
+      btn.textContent = I18N.t('btn.close');
+      btn.className = 'modal-btn ghost';
+      btn.onclick = window.closeTransferModal;
+    } catch(e) {
+      st.innerHTML = '<div class="err-box">⚠ ' + e.message + '</div>';
+      btn.disabled = false;
+      btn.textContent = I18N.t('btn.retry');
+    }
+  };
+</script>
+
+</body>
+</html>
