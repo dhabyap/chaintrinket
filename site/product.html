@@ -47,7 +47,35 @@
     font-family:var(--font-body);
     min-height:100vh;
     -webkit-font-smoothing:antialiased;
+    position:relative;
+    overflow-x:hidden;
   }
+  body::before{
+    content:"";
+    position:fixed; inset:0; z-index:0; pointer-events:none; opacity:0.5;
+    background-image:
+      repeating-linear-gradient(115deg, rgba(246,241,228,0.045) 0px, rgba(246,241,228,0.045) 1px, transparent 1px, transparent 26px),
+      repeating-linear-gradient(65deg, rgba(201,162,39,0.045) 0px, rgba(201,162,39,0.045) 1px, transparent 1px, transparent 26px);
+    background-size:220% 220%;
+    animation:driftTexture 34s linear infinite;
+  }
+  body::after{
+    content:"";
+    position:fixed; z-index:0; pointer-events:none;
+    width:420px; height:420px; border-radius:50%;
+    background:radial-gradient(circle, rgba(228,199,103,0.09), transparent 70%);
+    top:-140px; right:-100px;
+    animation:blobDrift 16s ease-in-out infinite alternate;
+  }
+  @keyframes driftTexture{
+    0%{ background-position:0% 0%, 0% 0%; }
+    100%{ background-position:220px 140px, -180px 200px; }
+  }
+  @keyframes blobDrift{
+    0%{ transform:translate(0,0) scale(1); }
+    100%{ transform:translate(-40px, 60px) scale(1.15); }
+  }
+  .wrap{ position:relative; z-index:1; }
   ::selection{background:var(--gold); color:var(--ink);}
   a{color:inherit;}
   button{font-family:inherit; cursor:pointer;}
@@ -190,6 +218,28 @@
   .h-desc{ margin-top:1px; }
   .h-desc b{ font-weight:600; }
 
+  /* Social Proof */
+  .social-proof{
+    margin:16px 0; padding:12px 14px;
+    background:var(--paper); border-radius:8px;
+    font-size:12px; color:var(--ink-soft);
+  }
+  .social-proof .sp-top{ display:flex; align-items:center; gap:7px; margin-bottom:8px; font-weight:500; }
+  .sp-pulse{
+    width:6px; height:6px; border-radius:50%; background:#22c55e;
+    animation:pulse-dot 2s infinite;
+  }
+  @keyframes pulse-dot{ 0%{opacity:1} 50%{opacity:0.3} 100%{opacity:1} }
+  .sp-feed{ display:flex; flex-direction:column; gap:4px; }
+  .sp-item{
+    display:flex; align-items:center; gap:6px; font-size:11.5px;
+    font-family:var(--font-mono); color:var(--ink-soft);
+  }
+  .sp-item .dot{ width:4px; height:4px; border-radius:50%; flex-shrink:0; }
+  .sp-item .dot.bought{ background:var(--jade); }
+  .sp-item .dot.view{ background:var(--gold-light); }
+  .sp-time{ color:rgba(91,87,72,0.55); margin-left:auto; font-size:10px; }
+
   .actions{ margin-top:20px; display:flex; flex-direction:column; gap:10px; }
   .btn{
     width:100%; border:none; border-radius:3px; padding:15px 16px;
@@ -213,11 +263,43 @@
     letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-soft);
   }
 
+  /* foot-stub — tear divider + mini ticker + contract footer */
+  .foot-stub{ margin-top:26px; position:relative; }
+  .foot-tear{
+    position:relative; height:2px;
+    background-image:linear-gradient(to right, rgba(246,241,228,0.22) 50%, transparent 50%);
+    background-size:12px 2px;
+  }
+  .foot-tear::before, .foot-tear::after{
+    content:""; position:absolute; top:-8px; width:16px; height:16px; border-radius:50%; background:var(--bg);
+  }
+  .foot-tear::before{ left:-18px; }
+  .foot-tear::after{ right:-18px; }
+
+  .mini-ticker{
+    overflow:hidden; white-space:nowrap; padding:12px 0 4px;
+  }
+  .mini-ticker-track{
+    display:inline-flex; gap:26px; animation:miniTick 20s linear infinite;
+  }
+  .mini-ticker-track span{
+    font-family:var(--font-mono); font-size:10.5px; color:rgba(246,241,228,0.5);
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .mini-ticker-track b{ color:var(--gold-light); font-weight:600; }
+  .mt-dot{ width:4px; height:4px; border-radius:50%; background:#5fd694; flex:none; }
+  @keyframes miniTick{ 0%{transform:translateX(0);} 100%{transform:translateX(-50%);} }
+
   .contract-foot{
-    margin-top:26px; text-align:center; font-family:var(--font-mono); font-size:11px;
+    margin-top:10px; text-align:center; font-family:var(--font-mono); font-size:11px;
     color:rgba(246,241,228,0.55); line-height:1.7;
   }
   .contract-foot a{ color:var(--gold-light); text-decoration:none; border-bottom:1px dotted rgba(228,199,103,0.5); }
+
+  @media (prefers-reduced-motion: reduce){
+    body::before, body::after{ animation:none; }
+    .mini-ticker-track{ animation:none; }
+  }
 
   /* modal sheet */
   .overlay{
@@ -307,7 +389,6 @@
     word-break:break-all;
   }
 
-  /* Social Proof */
   /* Receipt overlay */
   .receipt{
     background:var(--paper); border-radius:16px; overflow:hidden;
@@ -338,27 +419,6 @@
   .btn-share{ background:var(--gold); color:var(--ink); }
   .btn-dl{ background:var(--bg); color:var(--paper); }
 
-  .social-proof{
-    margin:16px 0; padding:12px 14px;
-    background:var(--paper); border-radius:8px;
-    font-size:12px; color:var(--ink-soft);
-  }
-  .sp-top{ display:flex; align-items:center; gap:7px; margin-bottom:8px; font-weight:500; }
-  .sp-pulse{
-    width:6px; height:6px; border-radius:50%; background:#22c55e;
-    animation:pulse-dot 2s infinite;
-  }
-  @keyframes pulse-dot{ 0%{opacity:1} 50%{opacity:0.3} 100%{opacity:1} }
-  .sp-feed{ display:flex; flex-direction:column; gap:4px; }
-  .sp-item{
-    display:flex; align-items:center; gap:6px; font-size:11.5px;
-    font-family:var(--font-mono); color:var(--ink-soft);
-  }
-  .sp-item .dot{ width:4px; height:4px; border-radius:50%; flex-shrink:0; }
-  .sp-item .dot.bought{ background:var(--jade); }
-  .sp-item .dot.view{ background:var(--gold-light); }
-  .sp-time{ color:rgba(91,87,72,0.55); margin-left:auto; font-size:10px; }
-
   /* Hamburger */
   .hamburger{
     display:none; flex-direction:column; gap:4px; cursor:pointer;
@@ -387,6 +447,34 @@
   .mobile-drawer a:hover, .mobile-drawer button:hover{ background:rgba(246,241,228,0.08); }
   .mobile-drawer .lang-toggle{ border:none; background:transparent; margin-bottom:4px; }
 
+  /* Demo dock */
+  .demo-dock{
+    position:fixed; bottom:14px; right:14px; z-index:40;
+    font-family:var(--font-mono);
+  }
+  .demo-toggle{
+    width:38px; height:38px; border-radius:50%; border:1px solid rgba(246,241,228,0.25);
+    background:var(--bg-2); color:var(--gold-light); font-size:14px; cursor:pointer;
+  }
+  .demo-panel{
+    position:absolute; bottom:46px; right:0; width:216px;
+    background:var(--bg-2); border:1px solid rgba(246,241,228,0.15);
+    border-radius:10px; padding:12px; display:none;
+    box-shadow:0 14px 30px -10px rgba(0,0,0,0.6);
+  }
+  .demo-panel.show{ display:block; }
+  .demo-panel h4{
+    font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:rgba(246,241,228,0.5);
+    margin:0 0 8px;
+  }
+  .demo-panel button{
+    display:block; width:100%; text-align:left; background:none; border:none;
+    color:var(--paper); font-size:11.5px; padding:6px 4px; border-radius:4px;
+    font-family:var(--font-mono);
+  }
+  .demo-panel button:hover{ background:rgba(246,241,228,0.08); }
+  .demo-note{ font-size:9.5px; color:rgba(246,241,228,0.4); margin-top:6px; line-height:1.4; }
+
   @media (max-width: 480px){
     .nav-links{ display: none !important; }
     .hamburger, .mobile-drawer{ display: flex !important; }
@@ -401,7 +489,6 @@
     .owner-addr{ font-size:12px; padding:5px 8px; }
     .btn{ font-size:13.5px; padding:13px 14px; }
     .sheet{ max-width:100%; border-radius:14px 14px 0 0; }
-    .overlay[style*="align-items:flex-end"] { align-items:flex-end !important; }
   }
   @media (max-width: 380px){
     .brand{ font-size:14px; letter-spacing:0; }
@@ -448,7 +535,8 @@
     *{ transition:none !important; }
   }
 </style>
-<script>if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js");</script></head>
+<script>if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js");</script>
+</head>
 <body>
 
 <div class="wrap">
@@ -522,13 +610,20 @@
     <div class="card-foot" data-i18n="product.foot.token">Token transfers automatically · permanently recorded on-chain</div>
   </div>
 
-  <div class="contract-foot">
-    <span data-i18n="product.contract">Contract {{addr}} on Stellar Explorer</span><br>
-    <span data-i18n="contract.powered">Powered by Soroban</span>
+  <!-- ===== foot-stub ===== -->
+  <div class="foot-stub">
+    <div class="foot-tear"></div>
+    <div class="mini-ticker">
+      <div class="mini-ticker-track" id="miniTickerTrack"></div>
+    </div>
+    <div class="contract-foot">
+      <span data-i18n="product.contract">Contract <a id="linkContract" href="#">CB3K…T9Q2</a> on Stellar Explorer</span><br>
+      <span data-i18n="contract.powered">Powered by Soroban</span>
+    </div>
   </div>
 </div>
 
-<!-- QRIS Sheet -->
+<!-- ===== QRIS Sheet ===== -->
 <div class="overlay" id="overlayQris">
   <div class="sheet">
     <div class="sheet-head">
@@ -554,13 +649,13 @@
       </div>
       <div class="status-title" data-i18n="product.qris.title">Pay via QRIS</div>
       <div class="status-sub" data-i18n="product.qris.sub">Scan with your phone camera — GoPay, OVO, Dana, all banks support QRIS.</div>
-      <button class="sheet-btn" onclick="closeSheet('overlayQris')" data-i18n="btn.close">Close</button>
+      <button class="sheet-btn" onclick="simulateQrisPay()" data-i18n="product.qris.simulate">Simulate payment success</button>
       <button class="sheet-btn secondary" onclick="closeSheet('overlayQris')" data-i18n="btn.cancel">Cancel</button>
     </div>
   </div>
 </div>
 
-<!-- Wallet Sheet -->
+<!-- ===== Wallet Sheet ===== -->
 <div class="overlay" id="overlayWallet">
   <div class="sheet">
     <div class="sheet-head">
@@ -592,7 +687,7 @@
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script src="./js/ct.js"></script>
 
-<!-- Purchase Confirmation Overlay -->
+<!-- ===== Purchase Confirmation Overlay ===== -->
 <div class="overlay" id="confirmOverlay">
   <div class="receipt">
     <div class="receipt-head">
@@ -606,6 +701,20 @@
       <button class="btn btn-share" onclick="shareConfirm()" data-i18n="confirm.share">Share Proof</button>
       <button class="btn btn-dl" onclick="document.getElementById('confirmOverlay').classList.remove('show')" data-i18n="btn.close">Close</button>
     </div>
+  </div>
+</div>
+
+<!-- ===== Demo dock ===== -->
+<div class="demo-dock">
+  <button class="demo-toggle" onclick="toggleDemo()" aria-label="Demo state">⚙</button>
+  <div class="demo-panel" id="demoPanel">
+    <h4>Demo state</h4>
+    <button onclick="setStamp('available')">Set: Available</button>
+    <button onclick="setStamp('sold')">Set: Sold</button>
+    <button onclick="forceWalletError('not_found')">Wallet: not found</button>
+    <button onclick="forceWalletError('rejected')">Wallet: user rejected</button>
+    <button onclick="forceWalletError('insufficient')">Wallet: insufficient balance</button>
+    <div class="demo-note">Panel testing frontend — hide/remove when real Soroban RPC integration is live.</div>
   </div>
 </div>
 
@@ -624,9 +733,49 @@
   }
 
   function openSheet(id) { document.getElementById(id).classList.add('show'); }
-  function closeSheet(id) { document.getElementById(id).classList.remove('show'); }
+  function closeSheet(id) {
+    document.getElementById(id).classList.remove('show');
+    // reset wallet sheet back to list view
+    if(id === 'overlayWallet'){
+      setTimeout(()=>{
+        document.getElementById('walletList').style.display = 'block';
+        document.getElementById('walletFlow').style.display = 'none';
+        document.getElementById('walletFlow').innerHTML = '';
+      }, 220);
+    }
+    if(id === 'overlayQris'){
+      setTimeout(()=>{
+        document.getElementById('qrisBody').innerHTML = document.getElementById('qrisBody').dataset.original || document.getElementById('qrisBody').innerHTML;
+      }, 220);
+    }
+  }
 
-  function openQris() { openSheet('overlayQris'); }
+  function openQris() {
+    const body = document.getElementById('qrisBody');
+    if(!body.dataset.original) body.dataset.original = body.innerHTML;
+    else body.innerHTML = body.dataset.original;
+    openSheet('overlayQris');
+  }
+
+  function simulateQrisPay() {
+    document.getElementById('qs2').classList.add('active');
+    const body = document.getElementById('qrisBody');
+    body.innerHTML = `
+      <div class="status-icon pending" id="qStatusIcon">&#9203;</div>
+      <div class="status-title">Processing payment&hellip;</div>
+      <div class="status-sub">Waiting for confirmation &amp; transferring token on Soroban.</div>
+    `;
+    setTimeout(()=>{
+      document.getElementById('qStatusIcon').className = 'status-icon success';
+      document.getElementById('qStatusIcon').innerHTML = '&#10003;';
+      body.querySelector('.status-title').textContent = 'This item is yours! 🎉';
+      body.querySelector('.status-sub').textContent = 'Digital ownership proof recorded on-chain. Pick up the item at the booth.';
+      body.insertAdjacentHTML('beforeend', `
+        <div class="mono-hash">tx: 4f9a...c22e &middot; block #184203</div>
+        <button class="sheet-btn" onclick="closeSheet('overlayQris'); setStamp('sold')">Done</button>
+      `);
+    }, 1400);
+  }
 
   async function handleConnect(name) {
     const fb = document.getElementById('walletFlow');
@@ -636,14 +785,14 @@
       const addr = await CT.connectFreighter();
       connectedPubKey = addr;
       fb.innerHTML = `
-        <div class="status-icon success" style="margin:6px auto 10px;">✓</div>
+        <div class="status-icon success" style="margin:6px auto 10px;">&#10003;</div>
         <div class="status-title">${CT.shortAddr(addr)}</div>
         <div class="status-sub" style="margin-bottom:16px;">${I18N.t('product.buy.wallet')}</div>
         <button class="sheet-btn" onclick="doBuy()" data-i18n="product.buy.now">Buy Now</button>
         <button class="sheet-btn secondary" onclick="closeSheet('overlayWallet')" data-i18n="btn.cancel">Cancel</button>
       `;
     } catch(e) {
-      fb.innerHTML = '<div class="err-box"><span>⚠</span><span>' + e.message + '</span></div><button class="sheet-btn retry" onclick="handleConnect(\'' + name + '\')">' + I18N.t('btn.retry') + '</button>';
+      fb.innerHTML = '<div class="err-box"><span>&#9888;</span><span>' + e.message + '</span></div><button class="sheet-btn retry" onclick="handleConnect(\'' + name + '\')">' + I18N.t('btn.retry') + '</button>';
     }
   }
 
@@ -656,7 +805,6 @@
       const priceXlm = (Number(info.price) / 10_000_000).toFixed(2);
       const pay = await CT.purchase(connectedPubKey, TOKEN_ID, String(priceXlm));
       const txHash = pay.hash || '';
-      // Build confirmation overlay
       var t = { name: currentTokenName, id: TOKEN_ID, price: priceXlm, owner: connectedPubKey };
       _confirmData = t;
       var body = document.getElementById('confirmBody');
@@ -673,13 +821,12 @@
         body.appendChild(d);
       });
       document.getElementById('confirmOverlay').classList.add('show');
-      // QR code
       var qrDiv = document.getElementById('confirmQr'); qrDiv.innerHTML = '';
       var url = window.location.origin + '/product.html?id=' + TOKEN_ID;
       if (typeof QRCode !== 'undefined') { new QRCode(qrDiv, {text: url, width: 104, height: 104, colorDark: '#0e0f0c', colorLight: '#fff'}); }
       closeSheet('overlayWallet');
     } catch(e) {
-      fb.innerHTML = '<div class="err-box"><span>⚠</span><span>' + e.message + '</span></div><button class="sheet-btn retry" onclick="doBuy()" data-i18n="btn.retry">' + I18N.t('btn.retry') + '</button>';
+      fb.innerHTML = '<div class="err-box"><span>&#9888;</span><span>' + e.message + '</span></div><button class="sheet-btn retry" onclick="doBuy()" data-i18n="btn.retry">' + I18N.t('btn.retry') + '</button>';
     }
   }
 
@@ -738,7 +885,6 @@
       supplyLabel.textContent = I18N.t('token.of', {i: TOKEN_ID, n: sup});
     } catch(e) {
       console.warn('Contract unavailable, trying demo products:', e.message || e);
-      // Fallback: show demo product if available
       const demos = CT.getDemoProducts(I18N.lang());
       const demo = demos.find(p => p.id === TOKEN_ID);
       if (demo) {
@@ -788,6 +934,30 @@
     }
   };
 
+  // Demo functions
+  window.setStamp = function(state) {
+    const el = document.getElementById('stamp');
+    if(state === 'available'){
+      el.className = 'stamp available';
+      el.innerHTML = 'Verified<br>Available';
+    } else {
+      el.className = 'stamp sold';
+      el.innerHTML = 'Verified<br>Sold';
+    }
+  };
+
+  function toggleDemo(){
+    document.getElementById('demoPanel').classList.toggle('show');
+  }
+  window.toggleDemo = toggleDemo;
+
+  let pendingErrorOverride = null;
+  function forceWalletError(type){
+    pendingErrorOverride = type;
+    toggleDemo();
+  }
+  window.forceWalletError = forceWalletError;
+
   // Hamburger
   function toggleMenu(){
     const d=document.getElementById('mobileDrawer');
@@ -801,6 +971,7 @@
     }
   });
 
+  // load product
   loadProduct().then(function(){
     var ogTitle = document.querySelector('meta[property="og:title"]');
     if (ogTitle && currentTokenName) ogTitle.content = currentTokenName;
@@ -808,18 +979,13 @@
 
   // Social Proof — simulate viewer count + recent activity
   (function initSocialProof(){
-    // Random viewer count 3–9
     var count = Math.floor(Math.random()*7)+3;
     document.getElementById('viewerCount').textContent = count;
-
-    // Simulate viewer count fluctuation
     setInterval(function(){
       var delta = Math.random()>0.5 ? 1 : -1;
       count = Math.max(2, Math.min(12, count + delta));
       document.getElementById('viewerCount').textContent = count;
     }, 8000);
-
-    // Recent activity feed (simulated)
     var feed = document.getElementById('activityFeed');
     var names = ['GD67…3F2A','GB28…9D1C','CAF2…7B4E','GD91…2X5F','FA12…8Q3J'];
     var actions = ['bought','view','view','view'];
@@ -834,9 +1000,21 @@
       feed.insertBefore(item, feed.firstChild);
       if(feed.children.length > 5) feed.removeChild(feed.lastChild);
     }
-    // Seed with some activity
     addActivity(); addActivity();
     setInterval(addActivity, 12000 + Math.random()*8000);
+  })();
+
+  // Mini ticker
+  (function initMiniTicker(){
+    const items = [
+      'Token #3 verified by <b>GA3K...91XZ</b>',
+      'Gold Chain Necklace sold — <b>0.75 XLM</b>',
+      'Silver Ring minted by <b>Toko</b>',
+      'Ownership transferred to <b>GB9P...74LC</b>',
+    ];
+    const html = items.map(t => `<span><span class="mt-dot"></span>${t}</span>`).join('');
+    const track = document.getElementById('miniTickerTrack');
+    if(track) track.innerHTML = html + html;
   })();
 
   // Scroll-to-top

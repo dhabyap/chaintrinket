@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title data-i18n="home.title">ChainTrinket — Fashion on-chain</title>
 <meta property="og:title" content="ChainTrinket — Physical accessories, ownership proof on-chain">
 <meta property="og:description" content="Bracelets, necklaces, rings — each item has one token on Stellar. Scan the tag, see the owner, take it home.">
@@ -44,6 +44,7 @@
     font-family:var(--font-body); -webkit-font-smoothing:antialiased;
     overflow-x:hidden;
   }
+
   /* ===== loading ===== */
   #loader{
     position:fixed; inset:0; z-index:100;
@@ -102,22 +103,55 @@
     display:flex; align-items:center; justify-content:center;
     font-family:var(--font-mono); font-size:10.5px; font-weight:600; color:var(--gold-light);
   }
-  .lang-toggle{
-    font-family:var(--font-mono); font-size:11px; letter-spacing:0.04em;
-    background:transparent; border:1px solid rgba(246,241,228,0.25); color:rgba(246,241,228,0.55);
-    padding:4px 10px; border-radius:12px; cursor:pointer; transition:all .15s;
-  }
-  .lang-toggle:hover{ border-color:var(--gold-light); color:var(--gold-light); }
   .nav-cta{
     font-family:var(--font-mono); font-size:12px; letter-spacing:0.04em;
     background:var(--gold); color:var(--ink); padding:9px 16px; border-radius:20px; font-weight:600;
   }
   .nav-cta:hover{ background:var(--gold-light); }
 
+  .lang-toggle{
+    font-family:var(--font-mono); font-size:11px; letter-spacing:0.04em;
+    background:transparent; border:1px solid rgba(246,241,228,0.25); color:rgba(246,241,228,0.55);
+    padding:4px 10px; border-radius:12px; cursor:pointer; transition:all .15s;
+  }
+  .lang-toggle:hover{ border-color:var(--gold-light); color:var(--gold-light); }
+
+  .nav-links{ display:flex; gap:6px; align-items:center; }
+
+  /* Hamburger */
+  .hamburger{
+    display:none; flex-direction:column; gap:4px; cursor:pointer;
+    background:none; border:none; padding:4px;
+  }
+  .hamburger span{
+    display:block; width:20px; height:2px; border-radius:2px;
+    background:var(--paper); transition:all .2s;
+  }
+  .hamburger.active span:nth-child(1){ transform:rotate(45deg) translate(4px,4px); }
+  .hamburger.active span:nth-child(2){ opacity:0; }
+  .hamburger.active span:nth-child(3){ transform:rotate(-45deg) translate(4px,-4px); }
+  .mobile-drawer{
+    display:none; position:fixed; top:56px; right:0; z-index:40;
+    background:rgba(14,15,12,0.96); backdrop-filter:blur(12px);
+    border-left:1px solid var(--line); border-bottom:1px solid var(--line);
+    padding:16px 20px; min-width:200px;
+    flex-direction:column; gap:4px;
+    transform:translateX(100%); transition:transform .22s ease;
+  }
+  .mobile-drawer.open{ transform:translateX(0); }
+  .mobile-drawer a, .mobile-drawer button{
+    padding:12px 14px; border-radius:8px; font-size:14px; text-align:left;
+    color:var(--paper); text-decoration:none;
+  }
+  .mobile-drawer a:hover, .mobile-drawer button:hover{ background:rgba(246,241,228,0.08); }
+  .mobile-drawer .lang-toggle{ border:none; background:transparent; margin-bottom:4px; }
+  .mobile-drawer .nav-cta{
+    background:var(--gold); color:var(--ink); text-align:center; font-weight:600;
+    margin-top:8px; border-radius:20px;
+  }
+
   /* ===== hero ===== */
   .hero{ padding:76px 0 60px; position:relative; z-index:1; }
-  .hero-content{ opacity:0; transform:translateY(20px); transition:all 0.7s ease-out; }
-  .hero-content.visible{ opacity:1; transform:translateY(0); }
   .hero-inner{ display:grid; grid-template-columns:1.1fr 0.9fr; gap:48px; align-items:center; }
   .eyebrow{
     font-family:var(--font-mono); font-size:11.5px; letter-spacing:0.14em; text-transform:uppercase;
@@ -237,55 +271,175 @@
   .stat b{ display:block; font-family:var(--font-display); font-size:26px; font-weight:600; color:var(--gold-light); }
   .stat span{ font-family:var(--font-mono); font-size:11px; color:rgba(246,241,228,0.55); text-transform:uppercase; letter-spacing:0.06em; }
 
-  /* ===== footer ===== */
-  footer{ padding:50px 0 40px; border-top:1px solid var(--line); }
-  .foot-inner{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; }
-  .foot-mono{ font-family:var(--font-mono); font-size:11.5px; color:rgba(246,241,228,0.45); }
+  /* ===== seller callout ===== */
+  .seller{ padding:70px 0; }
+  .seller-box{
+    background:linear-gradient(135deg, var(--bg-3), var(--bg-2));
+    border:1px solid var(--line); border-radius:14px; padding:40px;
+    display:grid; grid-template-columns:1.2fr 0.8fr; gap:30px; align-items:center;
+  }
+  .seller-box h3{ font-family:var(--font-display); font-weight:600; font-size:26px; margin:0 0 12px; line-height:1.25; }
+  .seller-box p{ font-size:14px; color:rgba(246,241,228,0.65); line-height:1.65; margin:0 0 20px; max-width:420px; }
+  .seller-list{ list-style:none; padding:0; margin:0; font-family:var(--font-mono); font-size:12.5px; color:rgba(246,241,228,0.7); }
+  .seller-list li{ padding:7px 0; border-bottom:1px solid var(--line); }
+  .seller-list li:last-child{ border-bottom:none; }
+
+  /* ===== footer — certificate stub ===== */
+  .site-foot{
+    position:relative; margin-top:10px; padding-top:54px;
+    background:
+      radial-gradient(ellipse 60% 50% at 20% 0%, rgba(201,162,39,0.16), transparent 60%),
+      radial-gradient(ellipse 50% 60% at 85% 100%, rgba(47,110,75,0.18), transparent 55%),
+      var(--bg-2);
+    overflow:hidden;
+  }
+  .site-foot::before{
+    /* guilloche-style engraved texture, like security paper on a certificate */
+    content:"";
+    position:absolute; inset:0; opacity:0.5; pointer-events:none;
+    background-image:
+      repeating-linear-gradient(115deg, rgba(246,241,228,0.05) 0px, rgba(246,241,228,0.05) 1px, transparent 1px, transparent 26px),
+      repeating-linear-gradient(65deg, rgba(201,162,39,0.05) 0px, rgba(201,162,39,0.05) 1px, transparent 1px, transparent 26px);
+    background-size:220% 220%;
+    animation:driftTexture 34s linear infinite;
+  }
+  .site-foot::after{
+    /* slow-drifting glow blob for depth */
+    content:"";
+    position:absolute; width:480px; height:480px; border-radius:50%;
+    background:radial-gradient(circle, rgba(228,199,103,0.10), transparent 70%);
+    top:-160px; right:-120px; pointer-events:none;
+    animation:blobDrift 16s ease-in-out infinite alternate;
+  }
+  @keyframes driftTexture{
+    0%{ background-position:0% 0%, 0% 0%; }
+    100%{ background-position:220px 140px, -180px 200px; }
+  }
+  @keyframes blobDrift{
+    0%{ transform:translate(0,0) scale(1); }
+    100%{ transform:translate(-40px, 60px) scale(1.15); }
+  }
+
+  .tear{
+    position:absolute; top:0; left:0; right:0; height:2px; z-index:1;
+    background-image:linear-gradient(to right, rgba(246,241,228,0.25) 50%, transparent 50%);
+    background-size:14px 2px;
+  }
+  .tear::before, .tear::after{
+    content:""; position:absolute; top:-9px; width:18px; height:18px; border-radius:50%; background:var(--bg);
+  }
+  .tear::before{ left:-9px; }
+  .tear::after{ right:-9px; }
+
+  /* ===== on-chain activity ticker ===== */
+  .ticker{
+    position:relative; z-index:1;
+    border-bottom:1px solid var(--line);
+    background:rgba(9,10,7,0.35);
+    overflow:hidden; white-space:nowrap;
+    padding:10px 0;
+  }
+  .ticker-track{
+    display:inline-flex; align-items:center; gap:36px;
+    animation:tickerScroll 26s linear infinite;
+  }
+  .ticker-item{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:var(--font-mono); font-size:11.5px; color:rgba(246,241,228,0.55);
+  }
+  .ticker-item .tk-dot{ width:5px; height:5px; border-radius:50%; background:#5fd694; flex:none; }
+  .ticker-item b{ color:var(--gold-light); font-weight:600; }
+  @keyframes tickerScroll{
+    0%{ transform:translateX(0); }
+    100%{ transform:translateX(-50%); }
+  }
+
+  .foot-grid{
+    position:relative; z-index:1;
+    display:grid; grid-template-columns:1.3fr 0.8fr 0.8fr 0.9fr; gap:34px;
+    padding:44px 0 34px;
+  }
+  .foot-brand .brand{ margin-bottom:12px; }
+  .foot-brand p{
+    font-size:13px; color:rgba(246,241,228,0.55); line-height:1.65; max-width:280px; margin:0;
+  }
+  .foot-col h5{
+    font-family:var(--font-mono); font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--gold-light); margin:0 0 14px;
+  }
+  .foot-col ul{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:9px; }
+  .foot-col a{
+    font-size:13px; color:rgba(246,241,228,0.68); transition:color .15s;
+  }
+  .foot-col a:hover{ color:var(--gold-light); }
+
+  .foot-seal{
+    width:82px; height:82px; border-radius:50%; border:2px solid var(--gold);
+    display:flex; align-items:center; justify-content:center; text-align:center;
+    font-family:var(--font-mono); font-weight:700; font-size:9.5px; letter-spacing:0.05em;
+    text-transform:uppercase; color:var(--gold-light); line-height:1.2;
+    transform:rotate(-9deg); position:relative; margin-left:auto;
+  }
+  .foot-seal::before{
+    content:""; position:absolute; inset:7px; border:1px dashed var(--gold); border-radius:50%; opacity:0.55;
+  }
+
+  .foot-bottom{
+    position:relative; z-index:1;
+    border-top:1px solid var(--line); padding:18px 0 26px;
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;
+  }
+  .foot-bottom-left{ font-family:var(--font-mono); font-size:11px; color:rgba(246,241,228,0.4); }
+  .foot-bottom-left code{ color:rgba(246,241,228,0.6); }
+
   .net-badge{
     font-family:var(--font-mono); font-size:10.5px; letter-spacing:0.06em;
     color:var(--jade-light); background:rgba(47,110,75,0.16); border:1px solid rgba(47,110,75,0.45);
     padding:5px 10px; border-radius:20px; display:inline-flex; align-items:center; gap:6px;
   }
 
-  .nav-links{ display:flex; gap:6px; align-items:center; }
-  /* Hamburger */
-  .hamburger{
-    display:none; flex-direction:column; gap:4px; cursor:pointer;
-    background:none; border:none; padding:4px;
+  /* ===== old footer fallback (kept for safety) ===== */
+  .footer{
+    border-top:1px solid var(--line); margin-top:40px;
+    padding:24px 0;
   }
-  .hamburger span{
-    display:block; width:20px; height:2px; border-radius:2px;
-    background:var(--paper); transition:all .2s;
+  .footer-inner{
+    max-width:820px; margin:0 auto; padding:0 24px;
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:12.5px; color:rgba(246,241,228,0.4);
   }
-  .hamburger.active span:nth-child(1){ transform:rotate(45deg) translate(4px,4px); }
-  .hamburger.active span:nth-child(2){ opacity:0; }
-  .hamburger.active span:nth-child(3){ transform:rotate(-45deg) translate(4px,-4px); }
-  .mobile-drawer{
-    display:none; position:fixed; top:56px; right:0; z-index:40;
-    background:rgba(14,15,12,0.96); backdrop-filter:blur(12px);
-    border-left:1px solid var(--line); border-bottom:1px solid var(--line);
-    padding:16px 20px; min-width:200px;
-    flex-direction:column; gap:4px;
-    transform:translateX(100%); transition:transform .22s ease;
-  }
-  .mobile-drawer.open{ transform:translateX(0); }
-  .mobile-drawer a, .mobile-drawer button{
-    padding:12px 14px; border-radius:8px; font-size:14px; text-align:left;
-    color:var(--paper); text-decoration:none;
-  }
-  .mobile-drawer a:hover, .mobile-drawer button:hover{ background:rgba(246,241,228,0.08); }
-  .mobile-drawer .lang-toggle{ border:none; background:transparent; margin-bottom:4px; }
-  .mobile-drawer .nav-cta{
-    background:var(--gold); color:var(--ink); text-align:center; font-weight:600;
-    margin-top:8px; border-radius:20px;
-  }
+  .footer-brand{ display:flex; align-items:center; gap:8px; font-weight:500; }
+  .footer-brand .brand-mark{ width:26px; height:26px; font-size:10px; }
+  .footer-links{ font-family:var(--font-mono); }
+  .footer-sep{ margin:0 8px; }
 
+  /* Scroll-to-top */
+  .scroll-top{
+    position:fixed; bottom:24px; right:24px; z-index:30;
+    width:40px; height:40px; border-radius:50%;
+    background:var(--gold); color:var(--ink); border:none;
+    font-size:18px; cursor:pointer; opacity:0; pointer-events:none;
+    transition:opacity .2s, transform .2s; transform:translateY(10px);
+    box-shadow:0 2px 8px rgba(0,0,0,0.3);
+  }
+  .scroll-top.visible{ opacity:1; pointer-events:auto; transform:translateY(0); }
+
+  /* Page transition */
+  .wrap, .tag-card, .page-body{ animation:fadeIn .35s ease; }
+  @keyframes fadeIn{ from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ===== responsive ===== */
+  @media (max-width:860px){
+    .foot-grid{ grid-template-columns:1fr 1fr; }
+    .foot-seal{ display:none; }
+  }
   @media (max-width: 860px){
     .hero-inner{ grid-template-columns:1fr; }
     .hero-visual{ order:-1; margin-bottom:10px; }
     h1.headline{ font-size:38px; }
     .cards{ grid-template-columns:1fr; }
     .lane{ grid-template-columns:1fr 1fr; }
+    .seller-box{ grid-template-columns:1fr; }
   }
   @media (max-width: 600px){
     .nav-links{ display: none !important; }
@@ -314,44 +468,11 @@
     .eyebrow{ font-size:10px; }
     .btn{ padding:12px 16px; font-size:13px; }
     .stat b{ font-size:18px; }
-    footer{ padding:30px 0 24px; }
     .foot-inner{ flex-direction:column; text-align:center; }
   }
-  /* Page transition */
-  .wrap, .tag-card, .page-body{ animation:fadeIn .35s ease; }
-  @keyframes fadeIn{ from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-
-  /* Footer */
-  .footer{
-    border-top:1px solid var(--line); margin-top:40px;
-    padding:24px 0;
-  }
-  .footer-inner{
-    max-width:820px; margin:0 auto; padding:0 24px;
-    display:flex; justify-content:space-between; align-items:center;
-    font-size:12.5px; color:rgba(246,241,228,0.4);
-  }
-  .footer-brand{ display:flex; align-items:center; gap:8px; font-weight:500; }
-  .footer-brand .brand-mark{ width:26px; height:26px; font-size:10px; }
-  .footer-links{ font-family:var(--font-mono); }
-  .footer-sep{ margin:0 8px; }
-  @media (max-width:480px){
-    .footer-inner{ flex-direction:column; gap:6px; text-align:center; }
-  }
-
-  /* Scroll-to-top */
-  .scroll-top{
-    position:fixed; bottom:24px; right:24px; z-index:30;
-    width:40px; height:40px; border-radius:50%;
-    background:var(--gold); color:var(--ink); border:none;
-    font-size:18px; cursor:pointer; opacity:0; pointer-events:none;
-    transition:opacity .2s, transform .2s; transform:translateY(10px);
-    box-shadow:0 2px 8px rgba(0,0,0,0.3);
-  }
-  .scroll-top.visible{ opacity:1; pointer-events:auto; transform:translateY(0); }
-
   @media (prefers-reduced-motion: reduce){
     .hang-tag{ animation:none; }
+    .site-foot::before, .site-foot::after, .ticker-track{ animation:none; }
   }
 </style>
 </head>
@@ -384,7 +505,7 @@
 
 <!-- ===== HERO ===== -->
 <section class="hero">
-  <div class="container hero-inner hero-content" id="heroContent">
+  <div class="container hero-inner reveal" id="heroContent">
     <div>
       <div class="eyebrow"><span class="dot"></span> <span data-i18n="home.hero.badge">Live at crypto events · Stellar Testnet</span></div>
       <h1 class="headline"><span data-i18n="home.hero.h1a">Physical accessories,</span><br><em data-i18n="home.hero.h1b">ownership proof</em><br><span data-i18n="home.hero.h1c">on-chain.</span></h1>
@@ -523,14 +644,70 @@
   </div>
 </section>
 
-<div class="footer">
-  <div class="footer-inner">
-    <div class="footer-brand"><span class="brand-mark">CT</span> ChainTrinket</div>
-    <div class="footer-links">
-      <span data-i18n="footer.built">Built on</span> Stellar<span class="footer-sep">·</span>2026
+<!-- ===== SELLER CALLOUT ===== -->
+<section class="seller" id="seller">
+  <div class="container">
+    <div class="seller-box reveal">
+      <div>
+        <h3 data-i18n="home.seller.h3">Selling at crypto events?<br>Give every item a digital identity.</h3>
+        <p data-i18n="home.seller.p">Upload photo and price, the system generates a QR ready to print. When sold, token transfers automatically — you just hand over the item.</p>
+        <a class="btn btn-primary" href="admin.html" data-i18n="home.seller.cta">Open admin panel →</a>
+      </div>
+      <ul class="seller-list">
+        <li data-i18n="home.seller.step1">1. Upload product + photo + price</li>
+        <li data-i18n="home.seller.step2">2. Print & attach QR to item</li>
+        <li data-i18n="home.seller.step3">3. Buyer scans, pays, picks up on the spot</li>
+        <li data-i18n="home.seller.step4">4. Leftover stock — QR can be reused</li>
+      </ul>
     </div>
   </div>
-</div>
+</section>
+
+<!-- ===== FOOTER — certificate stub ===== -->
+<footer class="site-foot">
+  <div class="tear"></div>
+
+  <div class="ticker">
+    <div class="ticker-track" id="tickerTrack">
+      <!-- duplicated below via JS for seamless loop -->
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <div class="brand"><span class="brand-mark">CT</span> ChainTrinket</div>
+        <p data-i18n="home.footer.brandDesc">Fashion on-chain — every accessory carries its owner's story. Built on Stellar Soroban, delivered through a physical tag.</p>
+      </div>
+      <div class="foot-col">
+        <h5 data-i18n="home.footer.explore">Explore</h5>
+        <ul>
+          <li><a href="catalog.html" data-i18n="nav.catalog">Catalog</a></li>
+          <li><a href="admin.html" data-i18n="nav.admin">Admin panel</a></li>
+          <li><a href="#how" data-i18n="nav.how">How to buy</a></li>
+          <li><a href="#seller" data-i18n="home.footer.forSeller">For sellers</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h5 data-i18n="home.footer.contracts">Contracts</h5>
+        <ul>
+          <li><a href="#" onclick="return false;">trinket_token</a></li>
+          <li><a href="#" onclick="return false;">Stellar Explorer</a></li>
+          <li><a href="#" onclick="return false;">Soroban docs</a></li>
+        </ul>
+      </div>
+      <div class="foot-col" style="align-items:flex-end; display:flex; flex-direction:column;">
+        <h5 style="align-self:flex-end;" data-i18n="home.footer.issued">Issued</h5>
+        <div class="foot-seal">Verified<br>Build<br>2026</div>
+      </div>
+    </div>
+
+    <div class="foot-bottom">
+      <div class="foot-bottom-left">ChainTrinket &middot; <span data-i18n="home.footer.hackathon">Hackathon build</span> &middot; contract <code>CB3K&hellip;T9Q2</code></div>
+      <div class="net-badge"><span style="width:6px;height:6px;border-radius:50%;background:#5fd694;display:inline-block;"></span> Stellar Testnet</div>
+    </div>
+  </div>
+</footer>
 
 <button id="scrollTop" class="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Scroll to top">↑</button>
 
@@ -574,7 +751,7 @@
     });
   }, { threshold: 0.1 });
 
-  document.querySelectorAll('.reveal, .split-card, .hero-content').forEach(el => {
+  document.querySelectorAll('.reveal, .split-card').forEach(el => {
     observer.observe(el);
   });
 
@@ -582,6 +759,21 @@
   window.addEventListener('scroll',function(){
     document.getElementById('scrollTop').classList.toggle('visible', window.scrollY > 300);
   });
+
+  // Ticker
+  const tickerItems = [
+    { text: 'Token #3 moved to', addr: 'GD67...3F2A' },
+    { text: 'Green Bead Bracelet minted by', addr: 'Shop' },
+    { text: 'Ownership verified by', addr: 'GA3K...91XZ' },
+    { text: 'Silver Engraved Ring sold —', addr: '0.35 XLM' },
+    { text: 'Ownership transferred to', addr: 'GB9P...74LC' },
+    { text: 'Gold Chain Necklace minted by', addr: 'Shop' },
+  ];
+  const track = document.getElementById('tickerTrack');
+  const html = tickerItems.map(i =>
+    `<span class="ticker-item"><span class="tk-dot"></span>${i.text} <b>${i.addr}</b></span>`
+  ).join('');
+  track.innerHTML = html + html; // duplicate for seamless loop
 
   I18N.apply();
 </script>
