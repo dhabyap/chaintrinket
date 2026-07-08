@@ -17,6 +17,15 @@ const CT = (() => {
   const formatPrice = p => (Number(p) / 10_000_000).toFixed(2) + ' XLM';
   const formatRp = p => 'Rp ' + Math.round(Number(p) / 10_000_000 * 17500).toLocaleString('id-ID');
 
+  const DEMO_PRODUCTS = [
+    {id:1, name:{en:'Blue Bead Bracelet',id:'Gelang Manik Biru'}, price:5000000, supply:10, owner:'GD67…3F2A', status:'available'},
+    {id:2, name:{en:'Gold Chain Necklace',id:'Kalung Rantai Emas'}, price:15000000, supply:5, owner:'GB28…9D1C', status:'available'},
+    {id:3, name:{en:'Jade Ring',id:'Cincin Giok'}, price:8000000, supply:8, owner:'GAJ5…FEOU', status:'available'},
+    {id:4, name:{en:'Silver Cufflinks',id:'Kancing Baju Perak'}, price:3000000, supply:15, owner:'GD91…2X5F', status:'available'},
+    {id:5, name:{en:'Leather Wrap Bracelet',id:'Gelang Lilit Kulit'}, price:5000000, supply:12, owner:'CAF2…7B4E', status:'sold'}
+  ];
+  const getDemoProducts = (lang = 'en') => DEMO_PRODUCTS.map(p => ({ ...p, name: p.name[lang] || p.name.en }));
+
   async function _sim(method, args) {
     const acc = await sv.getAccount(CONFIG.admin);
     const tx = new StellarSdk.TransactionBuilder(acc, { fee: '1000', networkPassphrase: CONFIG.networkPassphrase })
@@ -140,7 +149,7 @@ const CT = (() => {
     connectFreighter,
     getFreighterAddress,
     freighterAvailable,
-    shortAddr, formatPrice, formatRp, CONFIG
+    shortAddr, formatPrice, formatRp, CONFIG, getDemoProducts
   };
 })();
 window.CT = CT;

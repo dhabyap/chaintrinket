@@ -146,6 +146,39 @@
     .filter-bar{ flex-wrap:wrap; }
     .filter-btn{ font-size:11px; padding:7px 12px; }
   }
+  /* Page transition */
+  .wrap, .tag-card, .page-body{ animation:fadeIn .35s ease; }
+  @keyframes fadeIn{ from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+  /* Footer */
+  .footer{
+    border-top:1px solid var(--line); margin-top:40px;
+    padding:24px 0;
+  }
+  .footer-inner{
+    max-width:820px; margin:0 auto; padding:0 24px;
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:12.5px; color:rgba(246,241,228,0.4);
+  }
+  .footer-brand{ display:flex; align-items:center; gap:8px; font-weight:500; }
+  .footer-brand .brand-mark{ width:26px; height:26px; font-size:10px; }
+  .footer-links{ font-family:var(--font-mono); }
+  .footer-sep{ margin:0 8px; }
+  @media (max-width:480px){
+    .footer-inner{ flex-direction:column; gap:6px; text-align:center; }
+  }
+
+  /* Scroll-to-top */
+  .scroll-top{
+    position:fixed; bottom:24px; right:24px; z-index:30;
+    width:40px; height:40px; border-radius:50%;
+    background:var(--gold); color:var(--ink); border:none;
+    font-size:18px; cursor:pointer; opacity:0; pointer-events:none;
+    transition:opacity .2s, transform .2s; transform:translateY(10px);
+    box-shadow:0 2px 8px rgba(0,0,0,0.3);
+  }
+  .scroll-top.visible{ opacity:1; pointer-events:auto; transform:translateY(0); }
+
   @media (max-width:400px){
     .brand-sub{ display:none; }
   }
@@ -180,6 +213,13 @@
     <button class="filter-btn active" data-i18n="catalog.filter.all" onclick="filterProducts('all',this)">All</button>
     <button class="filter-btn" data-i18n="catalog.filter.avail" onclick="filterProducts('available',this)">Available</button>
     <button class="filter-btn" data-i18n="catalog.filter.sold" onclick="filterProducts('sold',this)">Sold</button>
+    <input type="text" id="searchInput" placeholder="Cari produk..." style="flex:1;min-width:120px;padding:9px 14px;border-radius:20px;border:1.5px solid rgba(246,241,228,0.2);background:transparent;color:var(--paper);font-family:var(--font-mono);font-size:12px;outline:none;" oninput="doFilter()">
+    <select id="priceFilter" style="padding:9px 14px;border-radius:20px;border:1.5px solid rgba(246,241,228,0.2);background:transparent;color:var(--paper);font-family:var(--font-mono);font-size:12px;outline:none;" onchange="doFilter()">
+      <option value="all" style="background:var(--bg);color:var(--paper);">All Prices</option>
+      <option value="under5" style="background:var(--bg);color:var(--paper);">Under 5 XLM</option>
+      <option value="5to10" style="background:var(--bg);color:var(--paper);">5–10 XLM</option>
+      <option value="over10" style="background:var(--bg);color:var(--paper);">10+ XLM</option>
+    </select>
   </div>
 
   <div class="grid" id="productGrid">
@@ -198,24 +238,57 @@
   async function loadCatalog() {
     try {
       allTokens = await CT.getAllTokens();
-      // Skeleton removed automatically once allTokens populated
       render();
     } catch(e) {
-      console.error('loadCatalog', e);
-      document.getElementById('productGrid').innerHTML = '<div class="empty"><b data-i18n="error.load">' + I18N.t('error.load') + '</b><span>' + I18N.t('error.network') + '</span></div>';
+      console.warn('Contract unavailable, using demo products:', e.message || e);
+      allTokens = CT.getDemoProducts(I18N.lang());
+      render();
     }
   }
 
-  function render(filter) {
-    const curFilter = filter || document.querySelector('.filter-btn.active')?.dataset?.filter || 'all';
+  /** Get display name for a token (handles both string and {en,id} object) */
+  function getProductName(p) {
+    if (!p) return '';
+    if (typeof p.name === 'object') {
+      return p.name[I18N.lang()] || p.name.en || '';
+    }
+    return p.name;
+  }
+
+  function render() {
     const grid = document.getElementById('productGrid');
-    const filtered = curFilter === 'all' ? allTokens : allTokens.filter(p => p.status === curFilter);
+    const searchQ = (document.getElementById('searchInput')?.value || '').toLowerCase();
+    const priceVal = document.getElementById('priceFilter')?.value || 'all';
+    const statusFilter = document.querySelector('.filter-btn.active')?.dataset?.filter || 'all';
+
+    let filtered = allTokens;
+
+    // Status filter
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(p => p.status === statusFilter);
+    }
+
+    // Search by name
+    if (searchQ) {
+      filtered = filtered.filter(p => getProductName(p).toLowerCase().includes(searchQ));
+    }
+
+    // Price filter (price in stroops, 1 XLM = 10_000_000)
+    if (priceVal === 'under5') {
+      filtered = filtered.filter(p => Number(p.price) < 50000000);
+    } else if (priceVal === '5to10') {
+      filtered = filtered.filter(p => Number(p.price) >= 50000000 && Number(p.price) <= 100000000);
+    } else if (priceVal === 'over10') {
+      filtered = filtered.filter(p => Number(p.price) > 100000000);
+    }
+
     if (!filtered.length) {
       grid.innerHTML = '<div class="empty"><b>' + I18N.t('empty.title') + '</b><span>' + I18N.t('empty.sub') + '</span></div>';
       return;
     }
     grid.innerHTML = filtered.map((p, i) => {
       const color = swatches[p.id % swatches.length];
+      const displayName = getProductName(p);
       return `
         <div class="card" onclick="location.href='product.html?id=${p.id}'" style="transition-delay:${i*0.05}s">
           <div class="card-img">
@@ -234,7 +307,7 @@
               <span class="pill ${p.status}">${p.status === 'available' ? I18N.t('status.available') : I18N.t('status.sold')}</span>
               <span class="token-id">${I18N.t('token.of', {i: p.id, n: allTokens.length})}</span>
             </div>
-            <h3>${p.name}</h3>
+            <h3>${displayName}</h3>
             <div class="price-row">
               <span class="price-xlm" style="font-size:17px;font-weight:600;">${CT.formatPrice(p.price)}</span>
             </div>
@@ -245,7 +318,6 @@
         </div>`;
     }).join('');
     
-    // Trigger animation
     setTimeout(() => {
       document.querySelectorAll('.card').forEach(c => c.classList.add('show'));
     }, 50);
@@ -255,8 +327,11 @@
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     btn.dataset.filter = filter;
-    render(filter);
+    render();
   }
+
+  /** Combined filter triggered by search input and price select */
+  function doFilter() { render(); }
 
   // Hamburger
   function toggleMenu(){
@@ -272,8 +347,24 @@
   });
 
   loadCatalog();
+  // Scroll-to-top
+  window.addEventListener('scroll',function(){
+    document.getElementById('scrollTop').classList.toggle('visible', window.scrollY > 300);
+  });
+
   I18N.apply();
 </script>
+
+<div class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand"><span class="brand-mark">CT</span> ChainTrinket</div>
+    <div class="footer-links">
+      <span data-i18n="footer.built">Built on</span> Stellar<span class="footer-sep">·</span>2026
+    </div>
+  </div>
+</div>
+
+<button id="scrollTop" class="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Scroll to top">↑</button>
 
 </body>
 </html>

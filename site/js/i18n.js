@@ -117,14 +117,17 @@ const I18N = (() => {
 
     'product.error.offline': { id: 'Error<br>Offline', en: 'Error<br>Offline' },
 
+    'confirm.title': { id:'Pembelian Berhasil!', en:'Purchase Complete!' },
+    'confirm.share': { id:'Bagikan Bukti', en:'Share Proof' },
+
     /* ─── admin.html ─── */
     'admin.title':       { id: 'Produk kamu', en: 'Your products' },
     'admin.sub':         { id: 'trinket_token · mint, cetak QR, dan pantau status penjualan', en: 'trinket_token · mint, print QR, and monitor sales status' },
     'admin.btnNew':      { id: '+ Produk baru', en: '+ New product' },
-    'admin.stat.total':  { id: 'Total token', en: 'Total tokens' },
-    'admin.stat.avail':  { id: 'Tersedia',    en: 'Available' },
+    'admin.stat.total':  { id: 'Total Item', en: 'Total Items' },
     'admin.stat.sold':   { id: 'Terjual',     en: 'Sold' },
-    'admin.stat.omzet':  { id: 'Omzet event', en: 'Event revenue' },
+    'admin.stat.revenue':{ id: 'Pendapatan', en: 'Revenue (XLM)' },
+    'admin.stat.owners': { id: 'Pemilik', en: 'Owners' },
     'admin.ledger':      { id: 'Daftar token', en: 'Token list' },
     'admin.search':      { id: 'Cari produk...', en: 'Search products...' },
     'admin.th.product':  { id: 'Produk',      en: 'Product' },
@@ -220,6 +223,7 @@ const I18N = (() => {
     'myItems.receipt.share':  { id: 'Bagikan',  en: 'Share' },
     'myItems.receipt.dl':     { id: 'Simpan',   en: 'Save' },
     'myItems.receipt.copied': { id: 'Tautan disalin!', en: 'Link copied!' },
+    'footer.built': { id: 'Dibangun di atas', en: 'Built on' },
   };
 
   let current = localStorage.getItem(STORAGE_KEY) || 'en';
