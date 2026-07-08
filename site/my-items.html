@@ -170,6 +170,8 @@
   <a href="home.html" class="brand"><span class="brand-mark">CT</span> ChainTrinket</a>
   <div class="topbar-right">
     <button class="lang-toggle" onclick="I18N.toggle()">ID</button>
+    <a href="catalog.html" data-i18n="nav.catalog" style="font-family:var(--font-mono);font-size:11.5px;color:rgba(246,241,228,0.6);padding:6px 10px;text-decoration:none;">Catalog</a>
+    <a href="admin.html" data-i18n="nav.admin" style="font-family:var(--font-mono);font-size:11.5px;color:rgba(246,241,228,0.35);padding:6px 10px;text-decoration:none;">Admin</a>
   </div>
 </div>
 
@@ -181,20 +183,20 @@
 <div class="overlay" id="transferOverlay">
   <div class="modal">
     <div class="modal-head">
-      <h3>Transfer Token</h3>
+      <h3 data-i18n="myItems.transfer">Transfer Token</h3>
       <button class="modal-close" onclick="closeTransferModal()">×</button>
     </div>
     <div class="field">
-      <label>Token ID</label>
+      <label data-i18n="admin.sell.tokenId">Token ID</label>
       <input type="text" id="transferTokenId" readonly style="background:var(--paper-3);">
     </div>
     <div class="field">
-      <label>Recipient wallet address</label>
+      <label data-i18n="admin.sell.buyerAddr">Recipient wallet address</label>
       <input type="text" id="transferAddr" placeholder="G... or C...">
     </div>
     <div id="transferStatus" style="display:none;"></div>
-    <button class="modal-btn primary" id="transferBtn" onclick="doTransfer()">Transfer</button>
-    <button class="modal-btn ghost" onclick="closeTransferModal()">Cancel</button>
+    <button class="modal-btn primary" id="transferBtn" onclick="doTransfer()" data-i18n="myItems.transfer">Transfer</button>
+    <button class="modal-btn ghost" onclick="closeTransferModal()" data-i18n="btn.cancel">Cancel</button>
   </div>
 </div>
 
@@ -207,8 +209,16 @@
 
   function App() {
     const [wallet, setWallet] = useState(null);
-    const [items, setItems] = useState(null); // null = loading
+    const [items, setItems] = useState(null);
     const [error, setError] = useState(null);
+    const [langVer, setLangVer] = useState(0); // force re-render on lang toggle
+
+    useEffect(() => {
+      const h = () => setLangVer(v => v+1);
+      window.addEventListener('i18n-changed', h);
+      checkConnection();
+      return () => window.removeEventListener('i18n-changed', h);
+    }, []);
 
     async function connect() {
       try {
@@ -270,7 +280,7 @@
               {I18N.t('myItems.connect') || 'Connect wallet to see your items'}
             </span>
             <button className="btn-connect" onClick={connect}>
-              {I18N.t('product.buy.connect') || 'Connect Wallet'}
+              {I18N.t('product.buy.wallet') || 'Connect Wallet'}
             </button>
           </div>
         ) : (

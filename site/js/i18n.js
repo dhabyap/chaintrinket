@@ -250,6 +250,8 @@ const I18N = (() => {
     // Re-render dynamic content if render functions exist
     if (typeof render === 'function') render();
     if (typeof loadDashboard === 'function') loadDashboard();
+    // Trigger React re-render for my-items.html & any React page
+    window.dispatchEvent(new CustomEvent('i18n-changed', { detail: { lang: current } }));
   }
 
   function lang() { return current; }
