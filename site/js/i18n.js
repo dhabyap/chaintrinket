@@ -256,7 +256,30 @@ const I18N = (() => {
 
   function lang() { return current; }
 
-  return { t, apply, toggle, lang };
+  // Set active nav link based on current page
+  function setActiveNav() {
+    const page = window.location.pathname.split('/').pop() || 'home.html';
+    document.querySelectorAll('.nav-links a, .topbar-right a, .mobile-drawer a').forEach(a => {
+      const href = a.getAttribute('href');
+      if (href && href === page) a.classList.add('active');
+    });
+  }
+
+  // Global active nav style
+  (function injectNavStyle() {
+    const s = document.createElement('style');
+    s.textContent = '.nav-links a.active, .topbar-right a.active, .mobile-drawer a.active { color: var(--gold-light) !important; background: rgba(201,162,39,0.12) !important; }';
+    document.head.appendChild(s);
+  })();
+
+  // Run on DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setActiveNav);
+  } else {
+    setActiveNav();
+  }
+
+  return { t, apply, toggle, lang, setActiveNav };
 })();
 window.T = I18N.t;
 window.I18N = I18N;
